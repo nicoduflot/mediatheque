@@ -19,10 +19,15 @@ function getAuthorList($env = "front"){
     $nbRows = mysqli_num_rows($result);
     if($nbRows > 0){
         $i = 0;
+        echo "<h4>Tous les auteurs</h4>";
         echo "<ul>";
         while($i < $nbRows){
             $row = mysqli_fetch_assoc($result);
             $bgList = ($i%2 == 0) ? " style=\"background-color:#eee; margin-bottom: 2px;\"" : "style=\"margin-bottom: 2px;\"";
+            if($i%5==0){
+                echo "</ul>";
+                echo "<ul>";
+            }
             echo "<li class=\"row\"".$bgList.">";
             if($env == "front"){
                 //liste dans le front
@@ -32,10 +37,10 @@ function getAuthorList($env = "front"){
                 //liste dans l'admin
                 echo "<a href=\"index.php?action=showAuteur&idAuteur=". $row["id"] . "\" class=\"col-lg-4\">".
                     utf8_encode($row["prenom"])." ".utf8_encode($row["nom"])."</a>";
-                echo "<a href=\"index.php?action=editAuteur&idAuteur=".$row["id"]."\" class=\"col-lg-3\">
-                    <button class=\"btn btn-success\">Editer l'auteur</button></a>";
-                echo "<a href=\"index.php?action=deleteAuteur&idAuteur=".$row["id"]."\" class=\"col-lg-3\">
-                    <button class=\"btn btn-danger\">Supprimer l'auteur</button></a>";
+                echo "<a href=\"index.php?action=editAuteur&idAuteur=".$row["id"]."\" class=\"col-lg-1\">
+                    <button class=\"btn btn-success\">Editer</button></a>";
+                echo "<a href=\"index.php?action=deleteAuteur&idAuteur=".$row["id"]."\" class=\"col-lg-1\">
+                    <button class=\"btn btn-danger\">Supprimer</button></a>";
             }
             echo "</li>";
             $i++;
@@ -58,12 +63,23 @@ function getBookList($env = "front"){
 	            `utilisateur` `u` ON `l`.`utilisateur_id` = `u`.`id` ORDER BY `l`.`titre`;";
     $result = mysqli_query($link, $sql);
     $nbRows = mysqli_num_rows($result);
+
+    $nbPages = (ceil($nbRows/5));
+    //echo "nbPages : ". $nbPages;
+
     if($nbRows > 0){
+        $page = 1;
         $i = 0;
-        echo "<ul>";
+        echo "<h4>Tous les livres</h4>";
+        echo "<ul id=\"livrePage\" class=\"\" data-pageId=\"".$page."\">";
         while($i < $nbRows){
             $row = mysqli_fetch_assoc($result);
             $bgList = ($i%2 == 0) ? " style=\"background-color:#eee; margin-bottom: 2px;\"" : "style=\"margin-bottom: 2px;\"";
+            if($i%5==0 && $i!=0){
+                $page++;
+                echo "</ul>";
+                echo "<ul id=\"livrePage\" class=\"\" data-pageId=\"".$page."\">";
+            }
             echo "<li class=\"row\"".$bgList.">";
             if($env == "front"){
                 //liste dans le front
@@ -74,11 +90,10 @@ function getBookList($env = "front"){
                 //liste dans l'admin
                 echo "<a href=\"index.php?action=livre&idLivre=". $row["id"] . "\" class=\"col-lg-4\">".
                     utf8_encode($row["titre"])."</a>";
-                echo "<a href=\"index.php?action=edit&idLivre=".$row["id"]."\" class=\"col-lg-2\">
-                    <button class=\"btn btn-success\">Editer le livre</button></a>";
-                echo "<a href=\"index.php?action=delete&idLivre=".$row["id"]."\" class=\"col-lg-2\">
-                    <button class=\"btn btn-danger\">Supprimer le livre</button></a>";
-                echo "<i class=\"col-lg-1\">".$row["pseudo"]."</i>";
+                echo "<a href=\"index.php?action=edit&idLivre=".$row["id"]."\" class=\"col-lg-1\">
+                    <button class=\"btn btn-success\">Editer</button></a>";
+                echo "<a href=\"index.php?action=delete&idLivre=".$row["id"]."\" class=\"col-lg-1\">
+                    <button class=\"btn btn-danger\">Supprimer</button></a>";
             }
             echo "</li>";
             $i++;

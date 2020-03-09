@@ -39,6 +39,7 @@ if(isset($_GET["security"]) && !isset($_SESSION["accesAdmin"])){
         <script src="../js/jquery-3.4.1.min.js"></script>
         <link rel="stylesheet" href="../css/bootstrap.min.css">
         <script src="../js/bootstrap.min.js"></script>
+        <script src="../js/functions.js"></script>
     </head>
     <body class="container">
         <?php if(!isset($_SESSION["accesAdmin"]) || $_SESSION["accesAdmin"] == false){ ?>

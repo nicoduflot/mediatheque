@@ -2,7 +2,7 @@
 $action = "";
 
 if(!isset($_GET["action"])){
-    $action = "list";
+    $action = "last";
 }else{
     $action = $_GET["action"];
 }
@@ -10,7 +10,9 @@ if(!isset($_GET["action"])){
 switch($action) {
     case "last":
         //echo "cas où last";
-        showBook(getLastBook(), "back");
+        //showBook(getLastBook(), "back");
+        getBookList("back");
+        getAuthorList("back");
         break;
     case "list":
         getBookList("back");

@@ -3,15 +3,17 @@
 $action = "";
 
 if(!isset($_GET["action"])){
-    $action = "list";
+    $action = "index";
 }else{
     $action = $_GET["action"];
 }
 
 switch($action) {
-    case "last":
+    case "index":
         //echo "cas où last";
-        showBook(getLastBook());
+        //showBook(getLastBook());
+        getBookList();
+        getAuthorList();
         break;
     case "list":
         getBookList();
@@ -32,6 +34,7 @@ switch($action) {
         break;
     default:
         getBookList();
+        getAuthorList();
         break;
 }
 ?>
