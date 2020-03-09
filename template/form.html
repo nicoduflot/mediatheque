@@ -1,0 +1,16 @@
+<form method="post">
+    <div class="form-group row">
+        <label for="titre" class="col-lg-3">Titre</label>
+        <input type="text" name="titre" id="titre" class="col-lg-9" value="%titre%" />
+    </div>
+    <div class="form-group row">
+        <label for="resume" class="col-lg-3">Résumé</label>
+        <textarea name="resume" id="resume" class="col-lg-9" rows="10" cols="150">%resume%</textarea>
+    </div>
+    <input type="hidden" name="idLivre" id="idLivre" value="%idLivre%">
+    <input type="hidden" name="idUtilisateur" id="idUtilisateur" value="%idUtilisateur%">
+    <button type="submit" name="submitAddBook" id="submitAddBook" class="btn btn-success" value="Valider">Valider</button>
+    <a href="index.php?action=list">
+        <button type="button" name="cancelForm" id="cancelForm" value="Annuler" class="btn btn-danger">Annuler</button>
+    </a>
+</form>

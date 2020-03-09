@@ -1,0 +1,17 @@
+<div class="row" style="margin-top:20px;">
+    <div class="offset-4 col-lg-4 alert alert-warning">
+        <strong>Attention !</strong>
+        <p>
+            Êtes-vous sûr de vouloir supprimer le livre "%titre%" ?
+        </p>
+    </div>
+</div>
+<div class="row" style="margin-top:20px;">
+    <form method="post" class="offset-4 col-lg-4">
+        <input type="hidden" name="idLivre" id="idLivre" value="%idLivre%">
+        <button type="submit" name="deleteBook" id="deleteBook" class="btn btn-success" value="Valider">Valider</button>
+        <a href="index.php?action=list">
+            <button type="button" name="cancelForm" id="cancelForm" value="Annuler" class="btn btn-danger">Annuler</button>
+        </a>
+    </form>
+</div>

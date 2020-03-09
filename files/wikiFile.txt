@@ -1,0 +1,7 @@
+[title]Introduction[/title]
+[g]en gras[/g] en [i]italique[/i].
+[p]débuter un paragraphe.
+ecrire dans le paragraphe.
+fermer le paragraphe[/p]
+Une liste :
+[liste][li]premier item[/li][li]deuxième item[/li][li]dernier item[/li][/liste]
