@@ -7,10 +7,14 @@ function printRResult($data){
     echo "</pre>";
 }
 
+//génération des liste front et back (auteurs et livres)
+
+//Liste des auteurs
+
 function getAuthorList($env = "front"){
     //get the author list in a select input
     $link = openConn();
-    $sql = "SELECT * FROM `auteur`;";
+    $sql = "SELECT * FROM `auteur` `a` ORDER BY `a`.`nom`;";
     $result = mysqli_query($link, $sql);
     $nbRows = mysqli_num_rows($result);
     if($nbRows > 0){
@@ -43,45 +47,50 @@ function getAuthorList($env = "front"){
     closeConn($link);
 }
 
-function getAuthor($id, $env = "front"){
+//liste des livres
+
+function getBookList($env = "front"){
     $link = openConn();
-    $livre = "";
     $sql = "SELECT 
-	            `a`.`id`, `a`.`nom`, `a`.`prenom`, `a`.`bio`, `l`.`id` as `idLivre`, `l`.`titre`
-            FROM
-                `auteur` `a` LEFT JOIN 
-                `auteur_livre` `a_l` ON `a`.`id` = `a_l`.`idauteur` LEFT JOIN 
-                `livre` `l` ON `a_l`.`idlivre` = `l`.`id`
-            WHERE 
-                `a`.`id` = ".$id." ;";
+	            `l`.`id`, `l`.`titre`, `u`.`id` as `idUtilisateur`, `u`.`pseudo`
+            FROM 
+	            `livre` `l` LEFT JOIN 
+	            `utilisateur` `u` ON `l`.`utilisateur_id` = `u`.`id` ORDER BY `l`.`titre`;";
     $result = mysqli_query($link, $sql);
     $nbRows = mysqli_num_rows($result);
-    $editButton = "";
     if($nbRows > 0){
         $i = 0;
-        while($i < $nbRows) {
+        echo "<ul>";
+        while($i < $nbRows){
             $row = mysqli_fetch_assoc($result);
-            $livre = $livre . "<a href=\"index.php?action=livre&idLivre=".$row["idLivre"]."\">".$row["titre"]."</a><br />";
+            $bgList = ($i%2 == 0) ? " style=\"background-color:#eee; margin-bottom: 2px;\"" : "style=\"margin-bottom: 2px;\"";
+            echo "<li class=\"row\"".$bgList.">";
+            if($env == "front"){
+                //liste dans le front
+                echo "<a href=\"index.php?action=livre&idLivre=". $row["id"] . "\" class=\"col-lg-4\">".
+                    utf8_encode($row["titre"])."</a>";
+                echo "<i class=\"col-lg-1\">".$row["pseudo"]."</i>";
+            }else{
+                //liste dans l'admin
+                echo "<a href=\"index.php?action=livre&idLivre=". $row["id"] . "\" class=\"col-lg-4\">".
+                    utf8_encode($row["titre"])."</a>";
+                echo "<a href=\"index.php?action=edit&idLivre=".$row["id"]."\" class=\"col-lg-2\">
+                    <button class=\"btn btn-success\">Editer le livre</button></a>";
+                echo "<a href=\"index.php?action=delete&idLivre=".$row["id"]."\" class=\"col-lg-2\">
+                    <button class=\"btn btn-danger\">Supprimer le livre</button></a>";
+                echo "<i class=\"col-lg-1\">".$row["pseudo"]."</i>";
+            }
+            echo "</li>";
             $i++;
         }
-        //$row = mysqli_fetch_assoc($result);
-        //printRResult($row);
-        if($env != "front"){
-            $editButton = "".
-                "<a href=\"index.php?action=editAuteur&idAuteur=".$row["id"]."\">".
-                "<button type=\"button\" name=\"editAuteur\" id=\"editAuteur\" class=\"btn btn-primary\">".
-                "Editer".
-                "</button>".
-                "</a>";
-        }
-        return ["idAuteur"=>$row["id"], "prenom"=>$row["prenom"],
-            "nom"=>$row["nom"], "bio"=>$row["bio"], "livreAuteur" =>$livre, "editbutton"=>$editButton];
+        echo "</ul>";
     }else{
-        return ["idAuteur"=>"", "prenom"=>"",
-            "nom"=>"", "bio"=>"", "livreAuteur" =>$livre, "editbutton"=>$editButton];
+        echo "0 résultat";
     }
     closeConn($link);
 }
+
+// select de l'auteur pour le lien entre livre et auteur
 
 function createAuthorSelect(){
     $link = openConn();
@@ -112,6 +121,8 @@ function createAuthorSelect(){
     }
     closeConn($link);
 }
+
+// select du livre pour le lien entre livre et auteur
 
 function createBookSelect(){
     $link = openConn();
@@ -144,6 +155,8 @@ function createBookSelect(){
     closeConn($link);
 }
 
+//templating pour l'affichage et l'édition d'un livre
+
 function decodeBook($templateLine, $livre, $env = "front"){
     $pathFile = ($env != "front") ? "../" : "";
     $templateLine = str_replace("%titre%", utf8_encode(stripslashes($livre["titre"])), $templateLine);
@@ -160,6 +173,8 @@ function decodeBook($templateLine, $livre, $env = "front"){
     return $templateLine;
 }
 
+//templating pour l'affichage et l'édition d'un auteur
+
 function decodeAuthor($templateLine, $livre)
 {
     $templateLine = str_replace("%prenom%", utf8_encode(stripslashes($livre["prenom"])), $templateLine);
@@ -171,11 +186,15 @@ function decodeAuthor($templateLine, $livre)
     return $templateLine;
 }
 
+//templating pour le formulaire de lien entre un auteur et un livre.
+
 function decodeLinkAthBk($templateLine, $listeAuteur, $listeLivre){
     $templateLine = str_replace("%listeAuteur%", $listeAuteur, $templateLine);
     $templateLine = str_replace("%listeLivre%", $listeLivre, $templateLine);
     return $templateLine;
 }
+
+//fonction d'éxécution d'une requête sql
 
 function dbChangeQuery($link, $sql, $table){
     if(mysqli_query($link, $sql)){
@@ -184,6 +203,8 @@ function dbChangeQuery($link, $sql, $table){
         echo "erreur : ". utf8_decode($sql) ."<br />". mysqli_error($link);
     }
 }
+
+//fonction de vérification pour la connexion d'un utilisateur
 
 function getAuthentication($email, $password){
     $link = openConn();
@@ -202,6 +223,48 @@ function getAuthentication($email, $password){
         return false;
     }
 }
+
+// récupération d'un auteur particulier
+
+function getAuthor($id, $env = "front"){
+    $link = openConn();
+    $livre = "";
+    $sql = "SELECT 
+	            `a`.`id`, `a`.`nom`, `a`.`prenom`, `a`.`bio`, `l`.`id` as `idLivre`, `l`.`titre`
+            FROM
+                `auteur` `a` LEFT JOIN 
+                `auteur_livre` `a_l` ON `a`.`id` = `a_l`.`idauteur` LEFT JOIN 
+                `livre` `l` ON `a_l`.`idlivre` = `l`.`id`
+            WHERE 
+                `a`.`id` = ".$id." ;";
+    $result = mysqli_query($link, $sql);
+    $nbRows = mysqli_num_rows($result);
+    $editButton = "";
+    if($nbRows > 0){
+        $i = 0;
+        while($i < $nbRows) {
+            $row = mysqli_fetch_assoc($result);
+            $livre = $livre . "<a href=\"index.php?action=livre&idLivre=".$row["idLivre"]."\">".$row["titre"]."</a><br />";
+            $i++;
+        }
+        if($env != "front"){
+            $editButton = "".
+                "<a href=\"index.php?action=editAuteur&idAuteur=".$row["id"]."\">".
+                "<button type=\"button\" name=\"editAuteur\" id=\"editAuteur\" class=\"btn btn-primary\">".
+                "Editer".
+                "</button>".
+                "</a>";
+        }
+        return ["idAuteur"=>$row["id"], "prenom"=>$row["prenom"],
+            "nom"=>$row["nom"], "bio"=>$row["bio"], "livreAuteur" =>$livre, "editbutton"=>$editButton];
+    }else{
+        return ["idAuteur"=>"", "prenom"=>"",
+            "nom"=>"", "bio"=>"", "livreAuteur" =>$livre, "editbutton"=>$editButton];
+    }
+    closeConn($link);
+}
+
+// récupération d'un livre particulier.
 
 function getBook($id, $env = "front"){
     $link = openConn();
@@ -247,6 +310,8 @@ function getBook($id, $env = "front"){
     closeConn($link);
 }
 
+// récupération du dernier livre enregistré
+
 function getLastBook(){
     $link = openConn();
     $sql = "SELECT 
@@ -268,46 +333,7 @@ function getLastBook(){
     closeConn($link);
 }
 
-function getBookList($env = "front"){
-    $link = openConn();
-    $sql = "SELECT 
-	            `l`.`id`, `l`.`titre`, `u`.`id` as `idUtilisateur`, `u`.`pseudo`
-            FROM 
-	            `livre` `l` LEFT JOIN 
-	            `utilisateur` `u` ON `l`.`utilisateur_id` = `u`.`id`;";
-    $result = mysqli_query($link, $sql);
-    $nbRows = mysqli_num_rows($result);
-    if($nbRows > 0){
-        $i = 0;
-        echo "<ul>";
-        while($i < $nbRows){
-            $row = mysqli_fetch_assoc($result);
-            $bgList = ($i%2 == 0) ? " style=\"background-color:#eee; margin-bottom: 2px;\"" : "style=\"margin-bottom: 2px;\"";
-            echo "<li class=\"row\"".$bgList.">";
-            if($env == "front"){
-                //liste dans le front
-                echo "<a href=\"index.php?action=livre&idLivre=". $row["id"] . "\" class=\"col-lg-4\">".
-                    utf8_encode($row["titre"])."</a>";
-                echo "<i class=\"col-lg-1\">".$row["pseudo"]."</i>";
-            }else{
-                //liste dans l'admin
-                echo "<a href=\"index.php?action=livre&idLivre=". $row["id"] . "\" class=\"col-lg-4\">".
-                    utf8_encode($row["titre"])."</a>";
-                echo "<a href=\"index.php?action=edit&idLivre=".$row["id"]."\" class=\"col-lg-2\">
-                    <button class=\"btn btn-success\">Editer le livre</button></a>";
-                echo "<a href=\"index.php?action=delete&idLivre=".$row["id"]."\" class=\"col-lg-2\">
-                    <button class=\"btn btn-danger\">Supprimer le livre</button></a>";
-                echo "<i class=\"col-lg-1\">".$row["pseudo"]."</i>";
-            }
-            echo "</li>";
-            $i++;
-        }
-        echo "</ul>";
-    }else{
-        echo "0 résultat";
-    }
-    closeConn($link);
-}
+// appel de la page de confirmation de la suppression d'un auteur ou d'un livre
 
 function showDelete($data){
     $pathFile = "../template/alertDelete.html";
@@ -317,6 +343,18 @@ function showDelete($data){
     }else{
         while(!feof($template)){
             echo decodeBook(fgets($template), $data, "back");
+        }
+    }
+}
+
+function showDeleteAuthor($data){
+    $pathFile = "../template/alertDeleteAuthor.html";
+    if(!$template = fopen($pathFile, "r")){
+        echo "Echec de l'ouverture du fichier";
+        exit;
+    }else{
+        while(!feof($template)){
+            echo decodeAuthor(fgets($template), $data, "back");
         }
     }
 }

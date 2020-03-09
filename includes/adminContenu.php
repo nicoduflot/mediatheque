@@ -117,14 +117,33 @@ switch($action) {
     case "delete":
         if(isset($_GET["idLivre"])){
             if(isset($_POST["deleteBook"])){
+                //il faut supprimer en cascade les liens auteur_livre existants
+                $sqlKillLinks = "DELETE FROM `auteur_livre` `a_l` WHERE `a_l`.`idlivre` = ".$_GET["idLivre"].";";
                 $sql = "DELETE FROM `livre` WHERE `livre`.`id` = ".$_GET["idLivre"].";";
                 $link = openConn();
+                dbChangeQuery($link, $sqlKillLinks, "auteur_livre");
                 dbChangeQuery($link, $sql, "livre");
                 closeConn($link);
                 header("location: index.php?action=list");
                 //echo "Entrée effacée, <a href=\"index.php?action=list\">retour liste.</a>";
             }else{
                 showDelete(getBook($_GET["idLivre"]));
+            }
+        }
+        break;
+    case "deleteAuteur" :
+        if(isset($_GET["idAuteur"])){
+            if(isset($_POST["deleteAuthor"])){
+                //il faut supprimer en cascade les liens auteur_livre existants
+                $sqlKillLinks = "DELETE FROM `auteur_livre` `a_l` WHERE `a_l`.`idauteur` = ".$_GET["idAuteur"].";";
+                $sql = "DELETE FROM `auteur` WHERE `auteur`.`id` = ".$_GET["idAuteur"].";";
+                $link = openConn();
+                dbChangeQuery($link, $sqlKillLinks, "auteur_livre");
+                dbChangeQuery($link, $sql, "auteur");
+                closeConn($link);
+                header("location: index.php?action=authorList");
+            }else{
+                showDeleteAuthor(getAuthor($_GET["idAuteur"]));
             }
         }
         break;
