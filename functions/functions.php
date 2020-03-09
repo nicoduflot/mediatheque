@@ -43,7 +43,7 @@ function getAuthorList($env = "front"){
     closeConn($link);
 }
 
-function getAuthor($id){
+function getAuthor($id, $env = "front"){
     $link = openConn();
     $livre = "";
     $sql = "SELECT 
@@ -56,6 +56,7 @@ function getAuthor($id){
                 `a`.`id` = ".$id." ;";
     $result = mysqli_query($link, $sql);
     $nbRows = mysqli_num_rows($result);
+    $editButton = "";
     if($nbRows > 0){
         $i = 0;
         while($i < $nbRows) {
@@ -65,11 +66,19 @@ function getAuthor($id){
         }
         //$row = mysqli_fetch_assoc($result);
         //printRResult($row);
+        if($env != "front"){
+            $editButton = "".
+                "<a href=\"index.php?action=editAuteur&idAuteur=".$row["id"]."\">".
+                "<button type=\"button\" name=\"editAuteur\" id=\"editAuteur\" class=\"btn btn-primary\">".
+                "Editer".
+                "</button>".
+                "</a>";
+        }
         return ["idAuteur"=>$row["id"], "prenom"=>$row["prenom"],
-            "nom"=>$row["nom"], "bio"=>$row["bio"], "livreAuteur" =>$livre];
+            "nom"=>$row["nom"], "bio"=>$row["bio"], "livreAuteur" =>$livre, "editbutton"=>$editButton];
     }else{
         return ["idAuteur"=>"", "prenom"=>"",
-            "nom"=>"", "bio"=>"", "livreAuteur" =>$livre];
+            "nom"=>"", "bio"=>"", "livreAuteur" =>$livre, "editbutton"=>$editButton];
     }
     closeConn($link);
 }
@@ -144,6 +153,7 @@ function decodeBook($templateLine, $livre, $env = "front"){
     $templateLine = str_replace("%prenom%", utf8_encode(stripslashes($livre["prenom"])), $templateLine);
     $templateLine = str_replace("%idauteur%", utf8_encode(stripslashes($livre["idauteur"])), $templateLine);
     $templateLine = str_replace("%auteur%", utf8_encode(stripslashes($livre["auteur"])), $templateLine);
+    $templateLine = str_replace("%editbutton%", utf8_encode(stripslashes($livre["editbutton"])), $templateLine);
     $templateLine = str_replace("%env%", utf8_encode(stripslashes($pathFile)), $templateLine);
     $templateLine = str_replace("%idLivre%", utf8_encode(stripslashes($livre["id"])), $templateLine);
     $templateLine = str_replace("%idUtilisateur%", utf8_encode(stripslashes($livre["idUtilisateur"])), $templateLine);
@@ -156,7 +166,8 @@ function decodeAuthor($templateLine, $livre)
     $templateLine = str_replace("%nom%", utf8_encode(stripslashes($livre["nom"])), $templateLine);
     $templateLine = str_replace("%bio%", utf8_encode(stripslashes($livre["bio"])), $templateLine);
     $templateLine = str_replace("%livreAuteur%", utf8_encode(stripslashes($livre["livreAuteur"])), $templateLine);
-    $templateLine = str_replace("%idauteur%", utf8_encode(stripslashes($livre["idAuteur"])), $templateLine);
+    $templateLine = str_replace("%editbutton%", utf8_encode(stripslashes($livre["editbutton"])), $templateLine);
+    $templateLine = str_replace("%idAuteur%", utf8_encode(stripslashes($livre["idAuteur"])), $templateLine);
     return $templateLine;
 }
 
@@ -170,7 +181,7 @@ function dbChangeQuery($link, $sql, $table){
     if(mysqli_query($link, $sql)){
         echo "La table `".$table."` a bien été modifiée<br />";
     }else{
-        echo "erreur : ". $sql ."<br />". mysqli_error($link);
+        echo "erreur : ". utf8_decode($sql) ."<br />". mysqli_error($link);
     }
 }
 
@@ -205,6 +216,7 @@ function getBook($id, $env = "front"){
 	        WHERE `l`.`id` = ".$id." ;";
     //printRResult($sql);
     $auteur = "";
+    $editButton = "";
     $result = mysqli_query($link, $sql);
     $nbRows = mysqli_num_rows($result);
     if($nbRows > 0){
@@ -214,15 +226,23 @@ function getBook($id, $env = "front"){
             $auteur = $auteur . "<a href=\"index.php?action=showAuteur&idAuteur=".$row["idauteur"]."\">".$row["prenom"]." ".$row["nom"]."</a><br />";
             $i++;
         }
+        if($env != "front"){
+            $editButton = "".
+                "<a href=\"index.php?action=edit&idLivre=".$row["id"]."\">".
+                "<button type=\"button\" name=\"editLivre\" id=\"editLivre\" class=\"btn btn-primary\">".
+                "Editer".
+                "</button>".
+                "</a>";
+        }
         return ["id"=>$row["id"], "titre"=>$row["titre"],
             "idUtilisateur"=>$row["idUtilisateur"], "pseudo"=>$row["pseudo"],
             "resume"=>$row["resume"], "dateCreated"=>$row["date"],
-            "nom"=>$row["nom"], "prenom"=>$row["prenom"], "idauteur"=>$row["idauteur"], "auteur"=>$auteur];
+            "nom"=>$row["nom"], "prenom"=>$row["prenom"], "idauteur"=>$row["idauteur"], "auteur"=>$auteur, "editbutton"=>$editButton];
     }else{
         return ["id"=>"", "titre"=>"",
             "idUtilisateur"=>$_SESSION["idUtilisateur"], "pseudo"=>$_SESSION["utilisateur"],
             "resume"=>"", "dateCreated"=>"",
-            "nom"=>"", "prenom"=>"", "idauteur"=>"", "auteur"=>""];
+            "nom"=>"", "prenom"=>"", "idauteur"=>"", "auteur"=>"", "editbutton"=>$editButton];
     }
     closeConn($link);
 }

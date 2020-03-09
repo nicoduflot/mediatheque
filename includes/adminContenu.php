@@ -20,7 +20,7 @@ switch($action) {
         break;
     case "showAuteur":
         if(isset($_GET["idAuteur"])){
-            showAuthor(getAuthor($_GET["idAuteur"]), "back");
+            showAuthor(getAuthor($_GET["idAuteur"], "back"), "back");
         }
         break;
     case "addAuthor":
@@ -61,7 +61,7 @@ switch($action) {
                 closeConn($link);
                 header("location: index.php?action=authorList");
             }
-            showAuthor(getAuthor($_GET["idAuteur"]), "back", "form");
+            showAuthor(getAuthor($_GET["idAuteur"], "back"), "back", "form");
         }
         break;
     case "livre":
