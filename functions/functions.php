@@ -17,16 +17,36 @@ function getAuthorList($env = "front"){
     $sql = "SELECT * FROM `auteur` `a` ORDER BY `a`.`nom`;";
     $result = mysqli_query($link, $sql);
     $nbRows = mysqli_num_rows($result);
+    $pagination = "";
     if($nbRows > 0){
+        $nbPages = ceil($nbRows/5);
+        $pageNumber = 1;
+        if($nbPages>1){
+            $pagination = $pagination."<span>Pages : ";
+            for ($j=1;$j<=$nbPages;$j++){
+                if($j==1){
+                    $classApplied = "pagination-items-selected";
+                }else{
+                    $classApplied = "pagination-items";
+                }
+                $pagination = $pagination." <span id=\"pageNumberAuthor".$j."\" onclick=\"pagination(".$j.", ".$nbPages.", 'Author');\" class=\"".$classApplied."\">";
+                $pagination = $pagination.$j;
+                $pagination = $pagination."</span>";
+            }
+            $pagination = $pagination."</span>";
+        }
+
         $i = 0;
         echo "<h4>Tous les auteurs</h4>";
-        echo "<ul>";
+        echo $pagination;
+        echo "<ul id=\"listPaginationAuthor".$pageNumber."\" class=\"pagination-visible\">";
         while($i < $nbRows){
             $row = mysqli_fetch_assoc($result);
             $bgList = ($i%2 == 0) ? " style=\"background-color:#eee; margin-bottom: 2px;\"" : "style=\"margin-bottom: 2px;\"";
-            if($i%5==0){
+            if($i%5==0 && $i!=0){
                 echo "</ul>";
-                echo "<ul>";
+                $pageNumber++;
+                echo "<ul id=\"listPaginationAuthor".$pageNumber."\" class=\"pagination-hidden\">";
             }
             echo "<li class=\"row\"".$bgList.">";
             if($env == "front"){
@@ -63,23 +83,38 @@ function getBookList($env = "front"){
 	            `utilisateur` `u` ON `l`.`utilisateur_id` = `u`.`id` ORDER BY `l`.`titre`;";
     $result = mysqli_query($link, $sql);
     $nbRows = mysqli_num_rows($result);
-
-    $nbPages = (ceil($nbRows/5));
-    //echo "nbPages : ". $nbPages;
-
+    $pagination = "";
     if($nbRows > 0){
-        $page = 1;
+        $nbPages = ceil($nbRows/5);
+        $pageNumber = 1;
+        if($nbPages>1){
+            $pagination = $pagination."<span>Pages : ";
+            for ($j=1;$j<=$nbPages;$j++){
+                if($j==1){
+                    $classApplied = "pagination-items-selected";
+                }else{
+                    $classApplied = "pagination-items";
+                }
+                $pagination = $pagination." <span id=\"pageNumberBook".$j."\" onclick=\"pagination(".$j.", ".$nbPages.", 'Book');\" class=\"".$classApplied."\">";
+                $pagination = $pagination.$j;
+                $pagination = $pagination."</span>";
+            }
+            $pagination = $pagination."</span>";
+        }
+
         $i = 0;
         echo "<h4>Tous les livres</h4>";
-        echo "<ul id=\"livrePage\" class=\"\" data-pageId=\"".$page."\">";
+        echo $pagination;
+        echo "<ul id=\"listPaginationBook".$pageNumber."\" class=\"pagination-visible\">";
         while($i < $nbRows){
             $row = mysqli_fetch_assoc($result);
             $bgList = ($i%2 == 0) ? " style=\"background-color:#eee; margin-bottom: 2px;\"" : "style=\"margin-bottom: 2px;\"";
             if($i%5==0 && $i!=0){
-                $page++;
                 echo "</ul>";
-                echo "<ul id=\"livrePage\" class=\"\" data-pageId=\"".$page."\">";
+                $pageNumber++;
+                echo "<ul id=\"listPaginationBook".$pageNumber."\" class=\"pagination-hidden\">";
             }
+
             echo "<li class=\"row\"".$bgList.">";
             if($env == "front"){
                 //liste dans le front
