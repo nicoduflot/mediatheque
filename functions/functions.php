@@ -453,3 +453,113 @@ function showLinkAuthorMedia($env = "front"){
         }
     }
 }
+
+function addAuthor($nom, $prenom, $bio){
+    $link = openConn();
+    $sql = "INSERT INTO `auteur` 
+                    (`nom`, 
+                    `prenom`, 
+                    `bio` ) VALUES 
+                    ('".addslashes(utf8_decode($nom))."', 
+                    '".addslashes(utf8_decode($prenom))."',
+                    '".addslashes(utf8_decode($bio))."');";
+    dbChangeQuery($link, $sql, "auteur");
+    closeConn($link);
+}
+
+function editAuthor($idAuteur, $nom, $prenom, $bio){
+    $link = openConn();
+    $sql = "UPDATE 
+                `auteur` 
+            SET `nom` = '".addslashes(utf8_decode($nom))."', 
+                `prenom` = '".addslashes(utf8_decode($prenom))."',                         
+                `bio` = '".addslashes(utf8_decode($bio))."'                         
+            WHERE `auteur`.`id` = ".$idAuteur.";";
+    dbChangeQuery($link, $sql, "auteur");
+    closeConn($link);
+}
+
+function deleteAuthor($idAuteur){
+    //il faut supprimer en cascade les liens auteur_media existants
+    $sqlKillLinks = "DELETE FROM `auteur_media` `a_l` WHERE `a_l`.`idauteur` = ".$idAuteur.";";
+    $sql = "DELETE FROM `auteur` WHERE `auteur`.`id` = ".$idAuteur.";";
+    $link = openConn();
+    dbChangeQuery($link, $sqlKillLinks, "auteur_media");
+    dbChangeQuery($link, $sql, "auteur");
+    closeConn($link);
+}
+
+function addMedia($idUtilisateur, $titre, $dateNow, $resume){
+    $link = openConn();
+    $sql = "INSERT INTO `media` 
+                (`utilisateur_id`, 
+                `titre`, 
+                `date`, 
+                `resume` ) 
+            VALUES 
+                (".$idUtilisateur.", 
+                '".addslashes(utf8_decode($titre))."', 
+                '".$dateNow."',
+                '".addslashes(utf8_decode($resume))."');";
+    dbChangeQuery($link, $sql, "media");
+    closeConn($link);
+}
+
+function editMedia($idMedia, $titre, $resume){
+    $link = openConn();
+    $sql = "UPDATE 
+                `media` 
+            SET `titre` = '".addslashes(utf8_decode($titre))."', 
+                `resume` = '".addslashes(utf8_decode($resume))."'                         
+            WHERE `media`.`id` = ".$idMedia.";";
+    dbChangeQuery($link, $sql, "media");
+    closeConn($link);
+}
+
+function deleteMedia($idMedia){
+    //il faut supprimer en cascade les liens auteur_media existants
+    $sqlKillLinks = "DELETE FROM `auteur_media` `a_l` WHERE `a_l`.`idmedia` = ".$idMedia.";";
+    $sql = "DELETE FROM `media` WHERE `media`.`id` = ".$idMedia.";";
+    $link = openConn();
+    dbChangeQuery($link, $sqlKillLinks, "auteur_media");
+    dbChangeQuery($link, $sql, "media");
+    closeConn($link);
+}
+
+function addLinkAthMd($idAuteur, $idMedia){
+    $link = openConn();
+
+    $sql = "SELECT 
+	            * 
+            FROM 
+	            `auteur_media` `l` 
+	        WHERE 
+	            `idauteur` = ".$idAuteur." 
+	            AND `idMedia` = ".$idMedia.";";
+    $result = mysqli_query($link, $sql);
+    $nbRows = mysqli_num_rows($result);
+
+    if($nbRows == 0 && $idAuteur !=0 && $idMedia != 0) {
+        $sql = "INSERT INTO `auteur_media` 
+                        (`idauteur`, 
+                        `idmedia`) VALUES 
+                        (" . $idAuteur . ", 
+                        " . $idMedia . ");";
+        dbChangeQuery($link, $sql, "media");
+
+        header("location: index.php?action=list");
+    }
+    else{
+        if($nbRows != 0){
+            echo "Ce lien existe déjà";
+        }elseif ($idMedia == 0 && $idAuteur == 0){
+            echo "Vous devez choisir un auteur ET un Media";
+        }elseif($idMedia == 0){
+            echo "Vous devez choisir un media";
+        }else{
+            echo "Vous devez choisir un auteur";
+        }
+
+    }
+    closeConn($link);
+}
