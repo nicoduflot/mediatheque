@@ -10,7 +10,7 @@
                 <a class="nav-link" href="index.php">Médiathèque <span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="index.php?action=list">Tous les livres</a>
+                <a class="nav-link" href="index.php?action=list">Tous les Média</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="index.php?action=authorList">Tous les auteurs</a>

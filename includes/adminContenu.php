@@ -9,13 +9,11 @@ if(!isset($_GET["action"])){
 
 switch($action) {
     case "last":
-        //echo "cas où last";
-        //showBook(getLastBook(), "back");
-        getBookList("back");
+        getMediaList("back");
         getAuthorList("back");
         break;
     case "list":
-        getBookList("back");
+        getMediaList("back");
         break;
     case "authorList":
         getAuthorList("back");
@@ -38,7 +36,7 @@ switch($action) {
                     ('".addslashes(utf8_decode($nom))."', 
                     '".addslashes(utf8_decode($prenom))."',
                     '".addslashes(utf8_decode($bio))."');";
-            dbChangeQuery($link, $sql, "livre");
+            dbChangeQuery($link, $sql, "media");
             closeConn($link);
             header("location: index.php?action=authorList");
         }else{
@@ -66,9 +64,9 @@ switch($action) {
             showAuthor(getAuthor($_GET["idAuteur"], "back"), "back", "form");
         }
         break;
-    case "livre":
-        if(isset($_GET["idLivre"])){
-            showBook(getBook($_GET["idLivre"], "back"), "back");
+    case "media":
+        if(isset($_GET["idMedia"])){
+            showMedia(getMedia($_GET["idMedia"], "back"), "back");
         }
         break;
     case "add":
@@ -78,7 +76,7 @@ switch($action) {
             $dateNow = date('Y-m-d H:i:s');
             $idUtilisateur = $_POST["idUtilisateur"];
             $link = openConn();
-            $sql = "INSERT INTO `livre` 
+            $sql = "INSERT INTO `media` 
                     (`utilisateur_id`, 
                     `titre`, 
                     `date`, 
@@ -87,60 +85,60 @@ switch($action) {
                     '".addslashes(utf8_decode($titre))."', 
                     '".$dateNow."',
                     '".addslashes(utf8_decode($resume))."');";
-            dbChangeQuery($link, $sql, "livre");
+            dbChangeQuery($link, $sql, "media");
             closeConn($link);
             header("location: index.php?action=list");
         }else{
-            showBook(getBook("null"), "back", "form");
+            showMedia(getMedia("null"), "back", "form");
         }
         break;
     case "edit":
-        if(isset($_GET["idLivre"])){
+        if(isset($_GET["idMedia"])){
             if(isset($_POST["submitAddBook"])){
-                //echo "<br />Edition de livre";
+                //echo "<br />Edition de média";
                 $titre = $_POST["titre"];
                 $resume = $_POST["resume"];
                 $dateNow = date('Y-m-d H:i:s');
-                $idLivre = $_POST["idLivre"];
+                $idMedia = $_POST["idMedia"];
                 $idUtilisateur = $_POST["idUtilisateur"];
                 $link = openConn();
                 $sql = "UPDATE 
-                            `livre` 
+                            `media` 
                         SET `titre` = '".addslashes(utf8_decode($titre))."', 
                             `resume` = '".addslashes(utf8_decode($resume))."'                         
-                        WHERE `livre`.`id` = ".$idLivre.";";
-                dbChangeQuery($link, $sql, "livre");
+                        WHERE `media`.`id` = ".$idMedia.";";
+                dbChangeQuery($link, $sql, "media");
                 closeConn($link);
                 header("location: index.php?action=list");
             }
-            showBook(getBook($_GET["idLivre"]), "back", "form");
+            showMedia(getMedia($_GET["idMedia"]), "back", "form");
         }
         break;
     case "delete":
-        if(isset($_GET["idLivre"])){
+        if(isset($_GET["idMedia"])){
             if(isset($_POST["deleteBook"])){
-                //il faut supprimer en cascade les liens auteur_livre existants
-                $sqlKillLinks = "DELETE FROM `auteur_livre` `a_l` WHERE `a_l`.`idlivre` = ".$_GET["idLivre"].";";
-                $sql = "DELETE FROM `livre` WHERE `livre`.`id` = ".$_GET["idLivre"].";";
+                //il faut supprimer en cascade les liens auteur_media existants
+                $sqlKillLinks = "DELETE FROM `auteur_media` `a_l` WHERE `a_l`.`idmedia` = ".$_GET["idMedia"].";";
+                $sql = "DELETE FROM `media` WHERE `media`.`id` = ".$_GET["idMedia"].";";
                 $link = openConn();
-                dbChangeQuery($link, $sqlKillLinks, "auteur_livre");
-                dbChangeQuery($link, $sql, "livre");
+                dbChangeQuery($link, $sqlKillLinks, "auteur_media");
+                dbChangeQuery($link, $sql, "media");
                 closeConn($link);
                 header("location: index.php?action=list");
                 //echo "Entrée effacée, <a href=\"index.php?action=list\">retour liste.</a>";
             }else{
-                showDelete(getBook($_GET["idLivre"]));
+                showDelete(getMedia($_GET["idMedia"]));
             }
         }
         break;
     case "deleteAuteur" :
         if(isset($_GET["idAuteur"])){
             if(isset($_POST["deleteAuthor"])){
-                //il faut supprimer en cascade les liens auteur_livre existants
-                $sqlKillLinks = "DELETE FROM `auteur_livre` `a_l` WHERE `a_l`.`idauteur` = ".$_GET["idAuteur"].";";
+                //il faut supprimer en cascade les liens auteur_media existants
+                $sqlKillLinks = "DELETE FROM `auteur_media` `a_l` WHERE `a_l`.`idauteur` = ".$_GET["idAuteur"].";";
                 $sql = "DELETE FROM `auteur` WHERE `auteur`.`id` = ".$_GET["idAuteur"].";";
                 $link = openConn();
-                dbChangeQuery($link, $sqlKillLinks, "auteur_livre");
+                dbChangeQuery($link, $sqlKillLinks, "auteur_media");
                 dbChangeQuery($link, $sql, "auteur");
                 closeConn($link);
                 header("location: index.php?action=authorList");
@@ -152,36 +150,36 @@ switch($action) {
     case "linkAuthor":
         if(isset($_POST["submitAddLink"])){
             $idAuteur = $_POST["idAuteur"];
-            $idLivre = $_POST["idLivre"];
+            $idMedia = $_POST["idMedia"];
             $link = openConn();
 
             $sql = "SELECT 
 	            * 
             FROM 
-	            `auteur_livre` `l` 
+	            `auteur_media` `l` 
 	        WHERE 
 	            `idauteur` = ".$idAuteur." 
-	            AND `idlivre` = ".$idLivre.";";
+	            AND `idMedia` = ".$idMedia.";";
             $result = mysqli_query($link, $sql);
             $nbRows = mysqli_num_rows($result);
 
-            if($nbRows == 0 && $idAuteur !=0 && $idLivre != 0) {
-                $sql = "INSERT INTO `auteur_livre` 
+            if($nbRows == 0 && $idAuteur !=0 && $idMedia != 0) {
+                $sql = "INSERT INTO `auteur_media` 
                         (`idauteur`, 
-                        `idlivre`) VALUES 
+                        `idmedia`) VALUES 
                         (" . $idAuteur . ", 
-                        " . $idLivre . ");";
-                dbChangeQuery($link, $sql, "livre");
+                        " . $idMedia . ");";
+                dbChangeQuery($link, $sql, "media");
 
                 header("location: index.php?action=list");
             }
             else{
                 if($nbRows != 0){
                     echo "Ce lien existe déjà";
-                }elseif ($idLivre == 0 && $idAuteur == 0){
-                    echo "Vous devez choisir un auteur ET un livre";
-                }elseif($idLivre == 0){
-                    echo "Vous devez choisir un livre";
+                }elseif ($idMedia == 0 && $idAuteur == 0){
+                    echo "Vous devez choisir un auteur ET un Media";
+                }elseif($idMedia == 0){
+                    echo "Vous devez choisir un media";
                 }else{
                     echo "Vous devez choisir un auteur";
                 }
@@ -189,9 +187,9 @@ switch($action) {
             }
             closeConn($link);
         }
-        showLinkAuthorBook("back");
+        showLinkAuthorMedia("back");
         break;
     default:
-        showBook(getLastBook(), "back");
+        showMedia(getLastMedia(), "back");
 }
 ?>

@@ -68,7 +68,7 @@ if(isset($_GET["security"]) && !isset($_SESSION["accesAdmin"])){
             <header>
                 <?php include "../includes/adminMenu.php"; ?>
             </header>
-            <!-- <?php echo createAuthorSelect(); ?>&nbsp;<?php echo createBookSelect(); ?> -->
+            <!-- <?php echo createAuthorSelect(); ?>&nbsp;<?php echo createMediaSelect(); ?> -->
             <section>
                 <?php include "../includes/adminContenu.php"; ?>
             </section>

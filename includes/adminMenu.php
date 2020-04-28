@@ -10,7 +10,7 @@
                 <a class="nav-link" href="../index.php">Médiathèque <span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="index.php?action=list">Tous les livres</a>
+                <a class="nav-link" href="index.php?action=list">Tous les Média</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="index.php?action=authorList">Tous les auteurs</a>
@@ -20,9 +20,9 @@
                     Actions
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="index.php?action=add">Ajouter livre</a>
+                    <a class="dropdown-item" href="index.php?action=add">Ajouter Média</a>
                     <a class="dropdown-item" href="index.php?action=addAuthor">Ajouter auteur</a>
-                    <a class="dropdown-item" href="index.php?action=linkAuthor">Lier auteur - Livre</a>
+                    <a class="dropdown-item" href="index.php?action=linkAuthor">Lier auteur - Média</a>
                     <!--
                     <a class="dropdown-item" href="#">Another action</a>
                     <div class="dropdown-divider"></div>
@@ -47,11 +47,5 @@
             }
             ?>
         </ul>
-        <!--
-        <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-        </form>
-        -->
     </div>
 </nav>

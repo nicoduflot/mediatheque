@@ -12,15 +12,15 @@ switch($action) {
     case "index":
         //echo "cas où last";
         //showBook(getLastBook());
-        getBookList();
+        getMediaList();
         getAuthorList();
         break;
     case "list":
-        getBookList();
+        getMediaList();
         break;
-    case "livre":
-        if(isset($_GET["idLivre"])){
-            showBook(getBook($_GET["idLivre"]));
+    case "media":
+        if(isset($_GET["idMedia"])){
+            showMedia(getMedia($_GET["idMedia"]));
         }
         break;
     case "authorList":
@@ -33,7 +33,7 @@ switch($action) {
         }
         break;
     default:
-        getBookList();
+        getMediaList();
         getAuthorList();
         break;
 }

@@ -6,8 +6,10 @@ function printRResult($data){
     print_r($data);
     echo "</pre>";
 }
+// cette variable est globale pour la pagination des listes affichées front et back
+$ndResPPage = 10;
 
-//génération des liste front et back (auteurs et livres)
+//génération des liste front et back (auteurs et media)
 
 //Liste des auteurs
 
@@ -17,11 +19,12 @@ function getAuthorList($env = "front"){
     $sql = "SELECT * FROM `auteur` `a` ORDER BY `a`.`nom`;";
     $result = mysqli_query($link, $sql);
     $nbRows = mysqli_num_rows($result);
+    global $ndResPPage;
     $pagination = "";
     if($nbRows > 0){
-        $nbPages = ceil($nbRows/5);
+        $nbPages = ceil($nbRows/$ndResPPage);
         $pageNumber = 1;
-        if($nbPages>1){
+        if($nbPages>$pageNumber){
             $pagination = $pagination."<span>Pages : ";
             for ($j=1;$j<=$nbPages;$j++){
                 if($j==1){
@@ -43,7 +46,7 @@ function getAuthorList($env = "front"){
         while($i < $nbRows){
             $row = mysqli_fetch_assoc($result);
             $bgList = ($i%2 == 0) ? " style=\"background-color:#eee; margin-bottom: 2px;\"" : "style=\"margin-bottom: 2px;\"";
-            if($i%5==0 && $i!=0){
+            if($i%$ndResPPage==0 && $i!=0){
                 echo "</ul>";
                 $pageNumber++;
                 echo "<ul id=\"listPaginationAuthor".$pageNumber."\" class=\"pagination-hidden\">";
@@ -72,22 +75,23 @@ function getAuthorList($env = "front"){
     closeConn($link);
 }
 
-//liste des livres
+//liste des media
 
-function getBookList($env = "front"){
+function getMediaList($env = "front"){
     $link = openConn();
     $sql = "SELECT 
 	            `l`.`id`, `l`.`titre`, `u`.`id` as `idUtilisateur`, `u`.`pseudo`
             FROM 
-	            `livre` `l` LEFT JOIN 
+	            `media` `l` LEFT JOIN 
 	            `utilisateur` `u` ON `l`.`utilisateur_id` = `u`.`id` ORDER BY `l`.`titre`;";
     $result = mysqli_query($link, $sql);
     $nbRows = mysqli_num_rows($result);
     $pagination = "";
+    global $ndResPPage;
     if($nbRows > 0){
-        $nbPages = ceil($nbRows/5);
+        $nbPages = ceil($nbRows/$ndResPPage);
         $pageNumber = 1;
-        if($nbPages>1){
+        if($nbPages>$pageNumber){
             $pagination = $pagination."<span>Pages : ";
             for ($j=1;$j<=$nbPages;$j++){
                 if($j==1){
@@ -103,13 +107,13 @@ function getBookList($env = "front"){
         }
 
         $i = 0;
-        echo "<h4>Tous les livres</h4>";
+        echo "<h4>Tous les Média</h4>";
         echo $pagination;
         echo "<ul id=\"listPaginationBook".$pageNumber."\" class=\"pagination-visible\">";
         while($i < $nbRows){
             $row = mysqli_fetch_assoc($result);
             $bgList = ($i%2 == 0) ? " style=\"background-color:#eee; margin-bottom: 2px;\"" : "style=\"margin-bottom: 2px;\"";
-            if($i%5==0 && $i!=0){
+            if($i%$ndResPPage==0 && $i!=0){
                 echo "</ul>";
                 $pageNumber++;
                 echo "<ul id=\"listPaginationBook".$pageNumber."\" class=\"pagination-hidden\">";
@@ -118,16 +122,16 @@ function getBookList($env = "front"){
             echo "<li class=\"row\"".$bgList.">";
             if($env == "front"){
                 //liste dans le front
-                echo "<a href=\"index.php?action=livre&idLivre=". $row["id"] . "\" class=\"col-lg-4\">".
+                echo "<a href=\"index.php?action=media&idMedia=". $row["id"] . "\" class=\"col-lg-4\">".
                     utf8_encode($row["titre"])."</a>";
                 echo "<i class=\"col-lg-1\">".$row["pseudo"]."</i>";
             }else{
                 //liste dans l'admin
-                echo "<a href=\"index.php?action=livre&idLivre=". $row["id"] . "\" class=\"col-lg-4\">".
+                echo "<a href=\"index.php?action=media&idMedia=". $row["id"] . "\" class=\"col-lg-4\">".
                     utf8_encode($row["titre"])."</a>";
-                echo "<a href=\"index.php?action=edit&idLivre=".$row["id"]."\" class=\"col-lg-1\">
+                echo "<a href=\"index.php?action=edit&idMedia=".$row["id"]."\" class=\"col-lg-1\">
                     <button class=\"btn btn-success\">Editer</button></a>";
-                echo "<a href=\"index.php?action=delete&idLivre=".$row["id"]."\" class=\"col-lg-1\">
+                echo "<a href=\"index.php?action=delete&idMedia=".$row["id"]."\" class=\"col-lg-1\">
                     <button class=\"btn btn-danger\">Supprimer</button></a>";
             }
             echo "</li>";
@@ -140,7 +144,7 @@ function getBookList($env = "front"){
     closeConn($link);
 }
 
-// select de l'auteur pour le lien entre livre et auteur
+// select de l'auteur pour le lien entre media et auteur
 
 function createAuthorSelect(){
     $link = openConn();
@@ -172,21 +176,21 @@ function createAuthorSelect(){
     closeConn($link);
 }
 
-// select du livre pour le lien entre livre et auteur
+// select du media pour le lien entre media et auteur
 
-function createBookSelect(){
+function createMediaSelect(){
     $link = openConn();
     $sql = "SELECT 
 	            * 
             FROM 
-	            `livre` `l`
+	            `media` `l`
 	        ORDER BY 
 	            `l`.`titre`;";
     $result = mysqli_query($link, $sql);
     $nbRows = mysqli_num_rows($result);
     $selectBook = "";
-    $startSelect = "<select name=\"idLivre\" id=\"idLivre\" class=\"col-lg-9\" >";
-    $selectOptions = "<option value=\"0\">Choisir un livre</option>";
+    $startSelect = "<select name=\"idMedia\" id=\"idMedia\" class=\"col-lg-9\" >";
+    $selectOptions = "<option value=\"0\">Choisir un Média</option>";
     $endSelect = "</select>";
     $nbRows = mysqli_num_rows($result);
     if($nbRows > 0){
@@ -205,42 +209,42 @@ function createBookSelect(){
     closeConn($link);
 }
 
-//templating pour l'affichage et l'édition d'un livre
+//templating pour l'affichage et l'édition d'un media
 
-function decodeBook($templateLine, $livre, $env = "front"){
+function decodeMedia($templateLine, $media, $env = "front"){
     $pathFile = ($env != "front") ? "../" : "";
-    $templateLine = str_replace("%titre%", utf8_encode(stripslashes($livre["titre"])), $templateLine);
-    $templateLine = str_replace("%dateCreated%", utf8_encode(stripslashes($livre["dateCreated"])), $templateLine);
-    $templateLine = str_replace("%resume%", utf8_encode(stripslashes($livre["resume"])), $templateLine);
-    $templateLine = str_replace("%nom%", utf8_encode(stripslashes($livre["nom"])), $templateLine);
-    $templateLine = str_replace("%prenom%", utf8_encode(stripslashes($livre["prenom"])), $templateLine);
-    $templateLine = str_replace("%idauteur%", utf8_encode(stripslashes($livre["idauteur"])), $templateLine);
-    $templateLine = str_replace("%auteur%", utf8_encode(stripslashes($livre["auteur"])), $templateLine);
-    $templateLine = str_replace("%editbutton%", utf8_encode(stripslashes($livre["editbutton"])), $templateLine);
+    $templateLine = str_replace("%titre%", utf8_encode(stripslashes($media["titre"])), $templateLine);
+    $templateLine = str_replace("%dateCreated%", utf8_encode(stripslashes($media["dateCreated"])), $templateLine);
+    $templateLine = str_replace("%resume%", utf8_encode(stripslashes($media["resume"])), $templateLine);
+    $templateLine = str_replace("%nom%", utf8_encode(stripslashes($media["nom"])), $templateLine);
+    $templateLine = str_replace("%prenom%", utf8_encode(stripslashes($media["prenom"])), $templateLine);
+    $templateLine = str_replace("%idauteur%", utf8_encode(stripslashes($media["idauteur"])), $templateLine);
+    $templateLine = str_replace("%auteur%", utf8_encode(stripslashes($media["auteur"])), $templateLine);
+    $templateLine = str_replace("%editbutton%", utf8_encode(stripslashes($media["editbutton"])), $templateLine);
     $templateLine = str_replace("%env%", utf8_encode(stripslashes($pathFile)), $templateLine);
-    $templateLine = str_replace("%idLivre%", utf8_encode(stripslashes($livre["id"])), $templateLine);
-    $templateLine = str_replace("%idUtilisateur%", utf8_encode(stripslashes($livre["idUtilisateur"])), $templateLine);
+    $templateLine = str_replace("%idMedia%", utf8_encode(stripslashes($media["id"])), $templateLine);
+    $templateLine = str_replace("%idUtilisateur%", utf8_encode(stripslashes($media["idUtilisateur"])), $templateLine);
     return $templateLine;
 }
 
 //templating pour l'affichage et l'édition d'un auteur
 
-function decodeAuthor($templateLine, $livre)
+function decodeAuthor($templateLine, $media)
 {
-    $templateLine = str_replace("%prenom%", utf8_encode(stripslashes($livre["prenom"])), $templateLine);
-    $templateLine = str_replace("%nom%", utf8_encode(stripslashes($livre["nom"])), $templateLine);
-    $templateLine = str_replace("%bio%", utf8_encode(stripslashes($livre["bio"])), $templateLine);
-    $templateLine = str_replace("%livreAuteur%", utf8_encode(stripslashes($livre["livreAuteur"])), $templateLine);
-    $templateLine = str_replace("%editbutton%", utf8_encode(stripslashes($livre["editbutton"])), $templateLine);
-    $templateLine = str_replace("%idAuteur%", utf8_encode(stripslashes($livre["idAuteur"])), $templateLine);
+    $templateLine = str_replace("%prenom%", utf8_encode(stripslashes($media["prenom"])), $templateLine);
+    $templateLine = str_replace("%nom%", utf8_encode(stripslashes($media["nom"])), $templateLine);
+    $templateLine = str_replace("%bio%", utf8_encode(stripslashes($media["bio"])), $templateLine);
+    $templateLine = str_replace("%mediaAuteur%", utf8_encode(stripslashes($media["mediaAuteur"])), $templateLine);
+    $templateLine = str_replace("%editbutton%", utf8_encode(stripslashes($media["editbutton"])), $templateLine);
+    $templateLine = str_replace("%idAuteur%", utf8_encode(stripslashes($media["idAuteur"])), $templateLine);
     return $templateLine;
 }
 
-//templating pour le formulaire de lien entre un auteur et un livre.
+//templating pour le formulaire de lien entre un auteur et un media.
 
-function decodeLinkAthBk($templateLine, $listeAuteur, $listeLivre){
+function decodeLinkAthMd($templateLine, $listeAuteur, $listeMedia){
     $templateLine = str_replace("%listeAuteur%", $listeAuteur, $templateLine);
-    $templateLine = str_replace("%listeLivre%", $listeLivre, $templateLine);
+    $templateLine = str_replace("%listeMedia%", $listeMedia, $templateLine);
     return $templateLine;
 }
 
@@ -278,13 +282,13 @@ function getAuthentication($email, $password){
 
 function getAuthor($id, $env = "front"){
     $link = openConn();
-    $livre = "";
+    $media = "";
     $sql = "SELECT 
-	            `a`.`id`, `a`.`nom`, `a`.`prenom`, `a`.`bio`, `l`.`id` as `idLivre`, `l`.`titre`
+	            `a`.`id`, `a`.`nom`, `a`.`prenom`, `a`.`bio`, `l`.`id` as `idMedia`, `l`.`titre`
             FROM
                 `auteur` `a` LEFT JOIN 
-                `auteur_livre` `a_l` ON `a`.`id` = `a_l`.`idauteur` LEFT JOIN 
-                `livre` `l` ON `a_l`.`idlivre` = `l`.`id`
+                `auteur_media` `a_l` ON `a`.`id` = `a_l`.`idauteur` LEFT JOIN 
+                `media` `l` ON `a_l`.`idmedia` = `l`.`id`
             WHERE 
                 `a`.`id` = ".$id." ;";
     $result = mysqli_query($link, $sql);
@@ -294,7 +298,7 @@ function getAuthor($id, $env = "front"){
         $i = 0;
         while($i < $nbRows) {
             $row = mysqli_fetch_assoc($result);
-            $livre = $livre . "<a href=\"index.php?action=livre&idLivre=".$row["idLivre"]."\">".$row["titre"]."</a><br />";
+            $media = $media . "<a href=\"index.php?action=media&idMedia=".$row["idMedia"]."\">".$row["titre"]."</a><br />";
             $i++;
         }
         if($env != "front"){
@@ -306,25 +310,25 @@ function getAuthor($id, $env = "front"){
                 "</a>";
         }
         return ["idAuteur"=>$row["id"], "prenom"=>$row["prenom"],
-            "nom"=>$row["nom"], "bio"=>$row["bio"], "livreAuteur" =>$livre, "editbutton"=>$editButton];
+            "nom"=>$row["nom"], "bio"=>$row["bio"], "mediaAuteur" =>$media, "editbutton"=>$editButton];
     }else{
         return ["idAuteur"=>"", "prenom"=>"",
-            "nom"=>"", "bio"=>"", "livreAuteur" =>$livre, "editbutton"=>$editButton];
+            "nom"=>"", "bio"=>"", "mediaAuteur" =>$media, "editbutton"=>$editButton];
     }
     closeConn($link);
 }
 
-// récupération d'un livre particulier.
+// récupération d'un media particulier.
 
-function getBook($id, $env = "front"){
+function getMedia($id, $env = "front"){
     $link = openConn();
     $sql = "SELECT 
 	            `l`.`id`, `l`.`titre`, `u`.`id` as `idUtilisateur`, `u`.`pseudo`, 
 	            `l`.`resume`, `l`.`date`, `a`.`nom`, `a`.`prenom`, `a`.`id` as `idauteur` 
             FROM 
-	            `livre` `l` LEFT JOIN 
+	            `media` `l` LEFT JOIN 
 	            `utilisateur` `u` ON `l`.`utilisateur_id` = `u`.`id` LEFT JOIN 
-	             `auteur_livre` `a_l` ON `l`.`id` = `a_l`.`idlivre` LEFT JOIN 
+	             `auteur_media` `a_l` ON `l`.`id` = `a_l`.`idmedia` LEFT JOIN 
 	             `auteur` `a` ON `a_l`.`idauteur` = `a`.`id`  
 	        WHERE `l`.`id` = ".$id." ;";
     //printRResult($sql);
@@ -341,8 +345,8 @@ function getBook($id, $env = "front"){
         }
         if($env != "front"){
             $editButton = "".
-                "<a href=\"index.php?action=edit&idLivre=".$row["id"]."\">".
-                "<button type=\"button\" name=\"editLivre\" id=\"editLivre\" class=\"btn btn-primary\">".
+                "<a href=\"index.php?action=edit&idMedia=".$row["id"]."\">".
+                "<button type=\"button\" name=\"editMedia\" id=\"editMedia\" class=\"btn btn-primary\">".
                 "Editer".
                 "</button>".
                 "</a>";
@@ -360,15 +364,15 @@ function getBook($id, $env = "front"){
     closeConn($link);
 }
 
-// récupération du dernier livre enregistré
+// récupération du dernier media enregistré
 
-function getLastBook(){
+function getLastMedia(){
     $link = openConn();
     $sql = "SELECT 
 	            `l`.`id`, `l`.`titre`, `u`.`id` as `idUtilisateur`, `u`.`pseudo`,
 	            `l`.`resume`, `l`.`date` 
             FROM 
-	            `livre` `l` LEFT JOIN 
+	            `media` `l` LEFT JOIN 
 	            `utilisateur` `u` ON `l`.`utilisateur_id` = `u`.`id`
 	        ORDER BY 
 	            `l`.`id` DESC LIMIT 1;";
@@ -383,7 +387,7 @@ function getLastBook(){
     closeConn($link);
 }
 
-// appel de la page de confirmation de la suppression d'un auteur ou d'un livre
+// appel de la page de confirmation de la suppression d'un auteur ou d'un media
 
 function showDelete($data){
     $pathFile = "../template/alertDelete.html";
@@ -392,7 +396,7 @@ function showDelete($data){
         exit;
     }else{
         while(!feof($template)){
-            echo decodeBook(fgets($template), $data, "back");
+            echo decodeMedia(fgets($template), $data, "back");
         }
     }
 }
@@ -409,20 +413,20 @@ function showDeleteAuthor($data){
     }
 }
 
-function showBook($livre, $env = "front", $model = "livre"){
+function showMedia($media, $env = "front", $model = "media"){
     $pathFile = ($env != "front") ? "../" : "";
-    $pathFile = $pathFile.(($model != "livre") ? "template/form" : "template/livre");
+    $pathFile = $pathFile.(($model != "media") ? "template/form" : "template/media");
     if(!$template = fopen($pathFile.".html", "r")){
         echo "Echec de l'ouverture du fichier";
         exit;
     }else{
         while(!feof($template)){
-            echo decodeBook(fgets($template), $livre, $env);
+            echo decodeMedia(fgets($template), $media, $env);
         }
     }
 }
 
-function showAuthor($livre, $env = "front", $model = "author"){
+function showAuthor($media, $env = "front", $model = "author"){
     $pathFile = ($env != "front") ? "../" : "";
     $pathFile = $pathFile.(($model != "author") ? "template/formAuthor" : "template/auteur");
     if(!$template = fopen($pathFile.".html", "r")){
@@ -431,21 +435,21 @@ function showAuthor($livre, $env = "front", $model = "author"){
     }else{
 
         while(!feof($template)){
-            echo decodeAuthor(fgets($template), $livre);
+            echo decodeAuthor(fgets($template), $media);
         }
     }
 }
 
-function showLinkAuthorBook($env = "front"){
+function showLinkAuthorMedia($env = "front"){
     $pathFile = $pathFile = ($env != "front") ? "../" : "";
-    $pathFile = $pathFile."template/auteurLivre.html";
+    $pathFile = $pathFile."template/auteurMedia.html";
     if(!$template = fopen($pathFile, "r")){
         echo "Echec de l'ouverture du fichier";
         exit;
     }else{
 
         while(!feof($template)){
-            echo decodeLinkAthBk(fgets($template), createAuthorSelect(), createBookSelect());
+            echo decodeLinkAthMd(fgets($template), createAuthorSelect(), createMediaSelect());
         }
     }
 }
