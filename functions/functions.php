@@ -8,11 +8,13 @@ function printRResult($data){
 
 //variables globales
 $ndResPPage = 10;
+$pageNumber = 1;
 
 function pagination($nbResultQuery, $nbPPages, $typePagination, $element){
     $pagination = "";
     $nbPages = ceil($nbResultQuery/$nbPPages);
-    $pageNumber = 1;
+    //$pageNumber = 1;
+    global $pageNumber;
     if($nbPages>$pageNumber){
         $pagination = $pagination."<span>Pages : ";
         for ($j=1;$j<=$nbPages;$j++){
@@ -46,7 +48,8 @@ function getAuthorList($env = "front"){
     $nbRows = mysqli_num_rows($result);
     global $ndResPPage;
     $pagination = "";
-    $pageNumber = 1;
+    //$pageNumber = 1;
+    global $pageNumber;
     if($nbRows > 0){
         $pagination = pagination($nbRows, $ndResPPage, "pageNumberAuthor", "Author");
         $i = 0;
@@ -97,7 +100,8 @@ function getMediaList($env = "front"){
     $result = mysqli_query($link, $sql);
     $nbRows = mysqli_num_rows($result);
     $pagination = "";
-    $pageNumber = 1;
+    //$pageNumber = 1;
+    global $pageNumber;
     global $ndResPPage;
     if($nbRows > 0){
         $pagination = pagination($nbRows, $ndResPPage, "pageNumberBook", "Book");
@@ -147,7 +151,8 @@ function getCatList($env = "front"){
     $nbRows = mysqli_num_rows($result);
     global $ndResPPage;
     $pagination = "";
-    $pageNumber = 1;
+    //$pageNumber = 1;
+    global $pageNumber;
     if($nbRows > 0){
         $pagination = pagination($nbRows, $ndResPPage, "pageNumberCat", "Cat");
         $i = 0;
