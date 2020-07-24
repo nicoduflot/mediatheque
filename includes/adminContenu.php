@@ -11,12 +11,16 @@ switch($action) {
     case "last":
         getMediaList("back");
         getAuthorList("back");
+        getCatList("back");
         break;
     case "list":
         getMediaList("back");
         break;
     case "authorList":
         getAuthorList("back");
+        break;
+    case "catList":
+        getCatList("back");
         break;
     case "showAuteur":
         if(isset($_GET["idAuteur"])){
@@ -45,6 +49,17 @@ switch($action) {
                 header("location: index.php?action=authorList");
             }
             showAuthor(getAuthor($_GET["idAuteur"], "back"), "back", "form");
+        }
+        break;
+    case "deleteAuteur" :
+        if(isset($_GET["idAuteur"])){
+            if(isset($_POST["deleteAuthor"])){
+                $idAuteur = $_GET["idAuteur"];
+                deleteAuthor($idAuteur);
+                header("location: index.php?action=authorList");
+            }else{
+                showDeleteAuthor(getAuthor($_GET["idAuteur"]));
+            }
         }
         break;
     case "media":
@@ -91,17 +106,6 @@ switch($action) {
             }
         }
         break;
-    case "deleteAuteur" :
-        if(isset($_GET["idAuteur"])){
-            if(isset($_POST["deleteAuthor"])){
-                $idAuteur = $_GET["idAuteur"];
-                deleteAuthor($idAuteur);
-                header("location: index.php?action=authorList");
-            }else{
-                showDeleteAuthor(getAuthor($_GET["idAuteur"]));
-            }
-        }
-        break;
     case "linkAuthor":
         if(isset($_POST["submitAddLink"])){
             $idAuteur = $_POST["idAuteur"];
@@ -109,6 +113,38 @@ switch($action) {
             addLinkAthMd($idAuteur, $idMedia);
         }
         showLinkAuthorMedia("back");
+        break;
+    case "addCat":
+        if(isset($_POST["submitAddCat"])){
+            $nom = $_POST["nom"];
+            $description = $_POST["description"];
+            addCat($nom, $description);
+            header("location: index.php?action=list");
+        }
+        showCat(getCat("null"), "back", "form");
+        break;
+    case "editCat" :
+        if(isset($_GET["idCat"])){
+            if(isset($_POST["submitAddCat"])){
+                $nom = $_POST["nom"];
+                $description = $_POST["description"];
+                $idCat = $_POST["idCat"];
+                editCat($idCat, $nom, $description);
+                header("location: index.php?action=catList");
+            }
+            showCat(getCat($_GET["idCat"], "back"), "back", "form");
+        }
+        break;
+    case "deleteCat" :
+        if(isset($_GET["idCat"])){
+            if(isset($_POST["deleteCat"])){
+                $idCat = $_GET["idCat"];
+                deleteCat($idCat);
+                header("location: index.php?action=catList");
+            }else{
+                showDeleteCat(getCat($_GET["idCat"]));
+            }
+        }
         break;
     default:
         showMedia(getLastMedia(), "back");

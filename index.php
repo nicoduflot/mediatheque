@@ -1,6 +1,9 @@
 <?php
-session_start();
-include "includes/connection.php";
+//phpinfo();
+//session_start();
+include "./includes/connection.php";
+include "functions/dbChanges.php";
+include "functions/template.php";
 include "functions/functions.php";
 ?>
 <!doctype html>

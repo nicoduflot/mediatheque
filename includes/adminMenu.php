@@ -15,6 +15,9 @@
             <li class="nav-item">
                 <a class="nav-link" href="index.php?action=authorList">Tous les auteurs</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="index.php?action=catList">Toutes les catégories</a>
+            </li>
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Actions
@@ -22,6 +25,7 @@
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <a class="dropdown-item" href="index.php?action=add">Ajouter Média</a>
                     <a class="dropdown-item" href="index.php?action=addAuthor">Ajouter auteur</a>
+                    <a class="dropdown-item" href="index.php?action=addCat">Ajouter une catégorie</a>
                     <a class="dropdown-item" href="index.php?action=linkAuthor">Lier auteur - Média</a>
                     <!--
                     <a class="dropdown-item" href="#">Another action</a>

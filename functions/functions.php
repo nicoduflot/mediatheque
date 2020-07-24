@@ -1,44 +1,54 @@
 <?php
-
 // debug functions
 function printRResult($data){
     echo "<pre>";
     print_r($data);
     echo "</pre>";
 }
-// cette variable est globale pour la pagination des listes affichées front et back
+
+//variables globales
 $ndResPPage = 10;
 
+function pagination($nbResultQuery, $nbPPages, $typePagination, $element){
+    $pagination = "";
+    $nbPages = ceil($nbResultQuery/$nbPPages);
+    $pageNumber = 1;
+    if($nbPages>$pageNumber){
+        $pagination = $pagination."<span>Pages : ";
+        for ($j=1;$j<=$nbPages;$j++){
+            if($j==1){
+                $classApplied = "pagination-items-selected";
+            }else{
+                $classApplied = "pagination-items";
+            }
+            $pagination = $pagination." <span id=\"". $typePagination .$j."\" onclick=\"pagination(".$j.", ".$nbPages.", '" . $element ."');\" class=\"".$classApplied."\">";
+            $pagination = $pagination.$j;
+            $pagination = $pagination."</span>";
+        }
+        $pagination = $pagination."</span>";
+    }
+    return $pagination;
+}
+// cette variable est globale pour la pagination des listes affichées front et back
+
 //génération des liste front et back (auteurs et media)
-
 //Liste des auteurs
-
 function getAuthorList($env = "front"){
     //get the author list in a select input
     $link = openConn();
-    $sql = "SELECT * FROM `auteur` `a` ORDER BY `a`.`nom`;";
+    $sql = "SELECT `a`.*, COUNT(`m`.`id`) AS `NbLivre`
+	FROM 
+    	`auteur` `a` left join
+        `auteur_media` `am` ON `a`.`id` = `am`.`idauteur` LEFT JOIN 
+        `media` `m` ON `am`.`idmedia` = `m`.`id`
+    GROUP BY `a`.`id` ORDER BY `a`.`nom`;";
     $result = mysqli_query($link, $sql);
     $nbRows = mysqli_num_rows($result);
     global $ndResPPage;
     $pagination = "";
+    $pageNumber = 1;
     if($nbRows > 0){
-        $nbPages = ceil($nbRows/$ndResPPage);
-        $pageNumber = 1;
-        if($nbPages>$pageNumber){
-            $pagination = $pagination."<span>Pages : ";
-            for ($j=1;$j<=$nbPages;$j++){
-                if($j==1){
-                    $classApplied = "pagination-items-selected";
-                }else{
-                    $classApplied = "pagination-items";
-                }
-                $pagination = $pagination." <span id=\"pageNumberAuthor".$j."\" onclick=\"pagination(".$j.", ".$nbPages.", 'Author');\" class=\"".$classApplied."\">";
-                $pagination = $pagination.$j;
-                $pagination = $pagination."</span>";
-            }
-            $pagination = $pagination."</span>";
-        }
-
+        $pagination = pagination($nbRows, $ndResPPage, "pageNumberAuthor", "Author");
         $i = 0;
         echo "<h4>Tous les auteurs</h4>";
         echo $pagination;
@@ -55,7 +65,7 @@ function getAuthorList($env = "front"){
             if($env == "front"){
                 //liste dans le front
                 echo "<a href=\"index.php?action=showAuteur&idAuteur=". $row["id"] . "\" class=\"col-lg-4\">".
-                    utf8_encode($row["prenom"])." ".utf8_encode($row["nom"])."</a>";
+                    utf8_encode($row["prenom"])." ".utf8_encode($row["nom"])."</a> " . utf8_encode($row["NbLivre"]) ." média enregistrés";
             }else{
                 //liste dans l'admin
                 echo "<a href=\"index.php?action=showAuteur&idAuteur=". $row["id"] . "\" class=\"col-lg-4\">".
@@ -63,7 +73,7 @@ function getAuthorList($env = "front"){
                 echo "<a href=\"index.php?action=editAuteur&idAuteur=".$row["id"]."\" class=\"col-lg-1\">
                     <button class=\"btn btn-success\">Editer</button></a>";
                 echo "<a href=\"index.php?action=deleteAuteur&idAuteur=".$row["id"]."\" class=\"col-lg-1\">
-                    <button class=\"btn btn-danger\">Supprimer</button></a>";
+                    <button class=\"btn btn-danger\">Supprimer</button></a> <span class=\"offset-1 col-lg-2\">" . utf8_encode($row["NbLivre"]) ." média enregistrés</span>";
             }
             echo "</li>";
             $i++;
@@ -87,25 +97,10 @@ function getMediaList($env = "front"){
     $result = mysqli_query($link, $sql);
     $nbRows = mysqli_num_rows($result);
     $pagination = "";
+    $pageNumber = 1;
     global $ndResPPage;
     if($nbRows > 0){
-        $nbPages = ceil($nbRows/$ndResPPage);
-        $pageNumber = 1;
-        if($nbPages>$pageNumber){
-            $pagination = $pagination."<span>Pages : ";
-            for ($j=1;$j<=$nbPages;$j++){
-                if($j==1){
-                    $classApplied = "pagination-items-selected";
-                }else{
-                    $classApplied = "pagination-items";
-                }
-                $pagination = $pagination." <span id=\"pageNumberBook".$j."\" onclick=\"pagination(".$j.", ".$nbPages.", 'Book');\" class=\"".$classApplied."\">";
-                $pagination = $pagination.$j;
-                $pagination = $pagination."</span>";
-            }
-            $pagination = $pagination."</span>";
-        }
-
+        $pagination = pagination($nbRows, $ndResPPage, "pageNumberBook", "Book");
         $i = 0;
         echo "<h4>Tous les Média</h4>";
         echo $pagination;
@@ -118,7 +113,6 @@ function getMediaList($env = "front"){
                 $pageNumber++;
                 echo "<ul id=\"listPaginationBook".$pageNumber."\" class=\"pagination-hidden\">";
             }
-
             echo "<li class=\"row\"".$bgList.">";
             if($env == "front"){
                 //liste dans le front
@@ -132,6 +126,55 @@ function getMediaList($env = "front"){
                 echo "<a href=\"index.php?action=edit&idMedia=".$row["id"]."\" class=\"col-lg-1\">
                     <button class=\"btn btn-success\">Editer</button></a>";
                 echo "<a href=\"index.php?action=delete&idMedia=".$row["id"]."\" class=\"col-lg-1\">
+                    <button class=\"btn btn-danger\">Supprimer</button></a>";
+            }
+            echo "</li>";
+            $i++;
+        }
+        echo "</ul>";
+    }else{
+        echo "0 résultat";
+    }
+    closeConn($link);
+}
+
+//Liste des catégories
+function getCatList($env = "front"){
+    //get the author list in a select input
+    $link = openConn();
+    $sql = "SELECT * FROM `categorie` `c` ORDER BY `c`.`nom`;";
+    $result = mysqli_query($link, $sql);
+    $nbRows = mysqli_num_rows($result);
+    global $ndResPPage;
+    $pagination = "";
+    $pageNumber = 1;
+    if($nbRows > 0){
+        $pagination = pagination($nbRows, $ndResPPage, "pageNumberCat", "Cat");
+        $i = 0;
+        echo "<h4>Toutes les catégories</h4>";
+        echo $pagination;
+        echo "<ul id=\"listPaginationCat".$pageNumber."\" class=\"pagination-visible\">";
+        while($i < $nbRows){
+            $row = mysqli_fetch_assoc($result);
+            $bgList = ($i%2 == 0) ? " style=\"background-color:#eee; margin-bottom: 2px;\"" : "style=\"margin-bottom: 2px;\"";
+            if($i%$ndResPPage==0 && $i!=0){
+                echo "</ul>";
+                $pageNumber++;
+                echo "<ul id=\"listPaginationCat".$pageNumber."\" class=\"pagination-hidden\">";
+            }
+            echo "<li class=\"row\"".$bgList.">";
+            if($env == "front"){
+                //liste dans le front
+                echo "<a href=\"index.php?action=showCat&idCat=". $row["id"] . "\" class=\"col-lg-4\">".
+                    utf8_encode($row["nom"]).
+                    "</a>";
+            }else{
+                //liste dans l'admin
+                echo "<a href=\"index.php?action=showCat&idCat=". $row["id"] . "\" class=\"col-lg-4\">".
+                    utf8_encode($row["nom"])."</a>";
+                echo "<a href=\"index.php?action=editCat&idCat=".$row["id"]."\" class=\"col-lg-1\">
+                    <button class=\"btn btn-success\">Editer</button></a>";
+                echo "<a href=\"index.php?action=deleteCat&idCat=".$row["id"]."\" class=\"col-lg-1\">
                     <button class=\"btn btn-danger\">Supprimer</button></a>";
             }
             echo "</li>";
@@ -207,55 +250,6 @@ function createMediaSelect(){
         return $selectBook;
     }
     closeConn($link);
-}
-
-//templating pour l'affichage et l'édition d'un media
-
-function decodeMedia($templateLine, $media, $env = "front"){
-    $pathFile = ($env != "front") ? "../" : "";
-    $templateLine = str_replace("%titre%", utf8_encode(stripslashes($media["titre"])), $templateLine);
-    $templateLine = str_replace("%dateCreated%", utf8_encode(stripslashes($media["dateCreated"])), $templateLine);
-    $templateLine = str_replace("%resume%", utf8_encode(stripslashes($media["resume"])), $templateLine);
-    $templateLine = str_replace("%nom%", utf8_encode(stripslashes($media["nom"])), $templateLine);
-    $templateLine = str_replace("%prenom%", utf8_encode(stripslashes($media["prenom"])), $templateLine);
-    $templateLine = str_replace("%idauteur%", utf8_encode(stripslashes($media["idauteur"])), $templateLine);
-    $templateLine = str_replace("%auteur%", utf8_encode(stripslashes($media["auteur"])), $templateLine);
-    $templateLine = str_replace("%editbutton%", utf8_encode(stripslashes($media["editbutton"])), $templateLine);
-    $templateLine = str_replace("%env%", utf8_encode(stripslashes($pathFile)), $templateLine);
-    $templateLine = str_replace("%idMedia%", utf8_encode(stripslashes($media["id"])), $templateLine);
-    $templateLine = str_replace("%idUtilisateur%", utf8_encode(stripslashes($media["idUtilisateur"])), $templateLine);
-    return $templateLine;
-}
-
-//templating pour l'affichage et l'édition d'un auteur
-
-function decodeAuthor($templateLine, $media)
-{
-    $templateLine = str_replace("%prenom%", utf8_encode(stripslashes($media["prenom"])), $templateLine);
-    $templateLine = str_replace("%nom%", utf8_encode(stripslashes($media["nom"])), $templateLine);
-    $templateLine = str_replace("%bio%", utf8_encode(stripslashes($media["bio"])), $templateLine);
-    $templateLine = str_replace("%mediaAuteur%", utf8_encode(stripslashes($media["mediaAuteur"])), $templateLine);
-    $templateLine = str_replace("%editbutton%", utf8_encode(stripslashes($media["editbutton"])), $templateLine);
-    $templateLine = str_replace("%idAuteur%", utf8_encode(stripslashes($media["idAuteur"])), $templateLine);
-    return $templateLine;
-}
-
-//templating pour le formulaire de lien entre un auteur et un media.
-
-function decodeLinkAthMd($templateLine, $listeAuteur, $listeMedia){
-    $templateLine = str_replace("%listeAuteur%", $listeAuteur, $templateLine);
-    $templateLine = str_replace("%listeMedia%", $listeMedia, $templateLine);
-    return $templateLine;
-}
-
-//fonction d'éxécution d'une requête sql
-
-function dbChangeQuery($link, $sql, $table){
-    if(mysqli_query($link, $sql)){
-        echo "La table `".$table."` a bien été modifiée<br />";
-    }else{
-        echo "erreur : ". utf8_decode($sql) ."<br />". mysqli_error($link);
-    }
 }
 
 //fonction de vérification pour la connexion d'un utilisateur
@@ -364,6 +358,39 @@ function getMedia($id, $env = "front"){
     closeConn($link);
 }
 
+function getCat($id, $env = "front"){
+    $link = openConn();
+    $media = "";
+    $sql = "SELECT 
+	            `c`.`id`, `c`.`nom`, `c`.`description`
+            FROM
+                `categorie` `c`
+            WHERE 
+                `c`.`id` = ".$id." ;";
+    //printRResult($sql);
+    $result = mysqli_query($link, $sql);
+    $nbRows = mysqli_num_rows($result);
+    $editButton = "";
+    if($nbRows > 0){
+        $i = 0;
+        $row = mysqli_fetch_assoc($result);
+        if($env != "front"){
+            $editButton = "".
+                "<a href=\"index.php?action=editCat&idCat=".$row["id"]."\">".
+                "<button type=\"button\" name=\"editCat\" id=\"editCat\" class=\"btn btn-primary\">".
+                "Editer".
+                "</button>".
+                "</a>";
+        }
+        return ["idCat"=>$row["id"], "nom"=>$row["nom"],
+            "description"=>$row["description"], "editbutton"=>$editButton];
+    }else{
+        return ["idCat"=>"", "nom"=>"",
+            "description"=>"", "editbutton"=>$editButton];
+    }
+    closeConn($link);
+}
+
 // récupération du dernier media enregistré
 
 function getLastMedia(){
@@ -413,6 +440,18 @@ function showDeleteAuthor($data){
     }
 }
 
+function showDeleteCat($data){
+    $pathFile = "../template/alertDeleteCat.html";
+    if(!$template = fopen($pathFile, "r")){
+        echo "Echec de l'ouverture du fichier";
+        exit;
+    }else{
+        while(!feof($template)){
+            echo decodeCat(fgets($template), $data, "back");
+        }
+    }
+}
+
 function showMedia($media, $env = "front", $model = "media"){
     $pathFile = ($env != "front") ? "../" : "";
     $pathFile = $pathFile.(($model != "media") ? "template/form" : "template/media");
@@ -433,9 +472,22 @@ function showAuthor($media, $env = "front", $model = "author"){
         echo "Echec de l'ouverture du fichier";
         exit;
     }else{
-
         while(!feof($template)){
             echo decodeAuthor(fgets($template), $media);
+        }
+    }
+}
+
+function showCat($cat, $env = "front", $model = "cat"){
+    $pathFile = ($env != "front") ? "../" : "";
+    $pathFile = $pathFile.(($model != "cat") ? "template/formCategorie" : "template/categorie");
+    //printRResult($pathFile.".html");
+    if(!$template = fopen($pathFile.".html", "r")){
+        echo "Echec de l'ouverture du fichier";
+        exit;
+    }else{
+        while(!feof($template)){
+            echo decodeCat(fgets($template), $cat);
         }
     }
 }
@@ -452,114 +504,4 @@ function showLinkAuthorMedia($env = "front"){
             echo decodeLinkAthMd(fgets($template), createAuthorSelect(), createMediaSelect());
         }
     }
-}
-
-function addAuthor($nom, $prenom, $bio){
-    $link = openConn();
-    $sql = "INSERT INTO `auteur` 
-                    (`nom`, 
-                    `prenom`, 
-                    `bio` ) VALUES 
-                    ('".addslashes(utf8_decode($nom))."', 
-                    '".addslashes(utf8_decode($prenom))."',
-                    '".addslashes(utf8_decode($bio))."');";
-    dbChangeQuery($link, $sql, "auteur");
-    closeConn($link);
-}
-
-function editAuthor($idAuteur, $nom, $prenom, $bio){
-    $link = openConn();
-    $sql = "UPDATE 
-                `auteur` 
-            SET `nom` = '".addslashes(utf8_decode($nom))."', 
-                `prenom` = '".addslashes(utf8_decode($prenom))."',                         
-                `bio` = '".addslashes(utf8_decode($bio))."'                         
-            WHERE `auteur`.`id` = ".$idAuteur.";";
-    dbChangeQuery($link, $sql, "auteur");
-    closeConn($link);
-}
-
-function deleteAuthor($idAuteur){
-    //il faut supprimer en cascade les liens auteur_media existants
-    $sqlKillLinks = "DELETE FROM `auteur_media` `a_l` WHERE `a_l`.`idauteur` = ".$idAuteur.";";
-    $sql = "DELETE FROM `auteur` WHERE `auteur`.`id` = ".$idAuteur.";";
-    $link = openConn();
-    dbChangeQuery($link, $sqlKillLinks, "auteur_media");
-    dbChangeQuery($link, $sql, "auteur");
-    closeConn($link);
-}
-
-function addMedia($idUtilisateur, $titre, $dateNow, $resume){
-    $link = openConn();
-    $sql = "INSERT INTO `media` 
-                (`utilisateur_id`, 
-                `titre`, 
-                `date`, 
-                `resume` ) 
-            VALUES 
-                (".$idUtilisateur.", 
-                '".addslashes(utf8_decode($titre))."', 
-                '".$dateNow."',
-                '".addslashes(utf8_decode($resume))."');";
-    dbChangeQuery($link, $sql, "media");
-    closeConn($link);
-}
-
-function editMedia($idMedia, $titre, $resume){
-    $link = openConn();
-    $sql = "UPDATE 
-                `media` 
-            SET `titre` = '".addslashes(utf8_decode($titre))."', 
-                `resume` = '".addslashes(utf8_decode($resume))."'                         
-            WHERE `media`.`id` = ".$idMedia.";";
-    dbChangeQuery($link, $sql, "media");
-    closeConn($link);
-}
-
-function deleteMedia($idMedia){
-    //il faut supprimer en cascade les liens auteur_media existants
-    $sqlKillLinks = "DELETE FROM `auteur_media` `a_l` WHERE `a_l`.`idmedia` = ".$idMedia.";";
-    $sql = "DELETE FROM `media` WHERE `media`.`id` = ".$idMedia.";";
-    $link = openConn();
-    dbChangeQuery($link, $sqlKillLinks, "auteur_media");
-    dbChangeQuery($link, $sql, "media");
-    closeConn($link);
-}
-
-function addLinkAthMd($idAuteur, $idMedia){
-    $link = openConn();
-
-    $sql = "SELECT 
-	            * 
-            FROM 
-	            `auteur_media` `l` 
-	        WHERE 
-	            `idauteur` = ".$idAuteur." 
-	            AND `idMedia` = ".$idMedia.";";
-    $result = mysqli_query($link, $sql);
-    $nbRows = mysqli_num_rows($result);
-
-    if($nbRows == 0 && $idAuteur !=0 && $idMedia != 0) {
-        $sql = "INSERT INTO `auteur_media` 
-                        (`idauteur`, 
-                        `idmedia`) VALUES 
-                        (" . $idAuteur . ", 
-                        " . $idMedia . ");";
-        dbChangeQuery($link, $sql, "media");
-
-        header("location: index.php?action=list");
-    }
-    else{
-        if($nbRows != 0){
-            echo "Ce lien existe déjà";
-        }elseif ($idMedia == 0 && $idAuteur == 0){
-            echo "Vous devez choisir un auteur ET un Media";
-        }elseif($idMedia == 0){
-            echo "Vous devez choisir un media";
-        }else{
-            echo "Vous devez choisir un auteur";
-        }
-
-    }
-    closeConn($link);
 }

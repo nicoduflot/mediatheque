@@ -1,6 +1,8 @@
 <?php
 session_start();
 include "../includes/connection.php";
+include "../functions/dbChanges.php";
+include "../functions/template.php";
 include "../functions/functions.php";
 
 if(isset($_POST["submitForm"])){
@@ -20,15 +22,6 @@ if(isset($_GET["security"]) && !isset($_SESSION["accesAdmin"])){
     $_SESSION["accesAdmin"] = false;
     header('location: index.php');
 }
-/*elseif (isset($_GET["security"]) && isset($_SESSION["accesAdmin"])){
-    if($_GET["security"] == "on"){
-        $_SESSION["accesAdmin"] = false;
-        //header('location: index.php');
-    }
-}else{
-    $_SESSION["accesAdmin"] = false;
-}
-*/
 
 ?>
 <!doctype HTML>

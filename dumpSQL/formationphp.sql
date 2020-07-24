@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le :  mar. 28 avr. 2020 à 12:43
+-- Généré le :  mer. 13 mai 2020 à 06:56
 -- Version du serveur :  5.7.24
 -- Version de PHP :  7.2.14
 
@@ -21,6 +21,9 @@ SET time_zone = "+00:00";
 --
 -- Base de données :  `formationphp`
 --
+DROP DATABASE IF EXISTS `formationphp`;
+CREATE DATABASE IF NOT EXISTS `formationphp` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `formationphp`;
 
 -- --------------------------------------------------------
 
@@ -35,7 +38,7 @@ CREATE TABLE IF NOT EXISTS `auteur` (
   `prenom` varchar(255) DEFAULT NULL,
   `bio` text,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
 
 --
 -- Déchargement des données de la table `auteur`
@@ -48,8 +51,7 @@ INSERT INTO `auteur` (`id`, `nom`, `prenom`, `bio`) VALUES
 (4, 'Moore', 'Alan', 'Auteur de comics adultes.'),
 (5, 'King', 'Stephen', 'Il a commencé jeune.<br />\r\nIl a écrit des dizaines de livres<br />\r\nIl n\'a toujours pas arrêté.'),
 (6, 'Adams', 'Douglas', '<p>\r\n<strong>Douglas Noel Adams</strong>, né le 11 mars 1952 à Cambridge et mort le 11 mai 2001 (à 49 ans) à Santa Barbara, est un écrivain et scénariste britannique.\r\n</p>\r\n<p>\r\nIl est surtout connu pour son ?uvre Le Guide du voyageur galactique (The Hitchhiker\'s Guide to the Galaxy), une saga de science-fiction humoristique dont il scénarisa le feuilleton radio original puis écrivit la « trilogie en cinq volumes » de romans.\r\n</p>\r\n<p>\r\nDouglas Adams est né en 1952 à Cambridge. Il est le fils d\'un étudiant en théologie et d\'une infirmière. Après de nombreux petits boulots tels que portier dans un hôpital psychiatrique, nettoyeur d\'abris à poulets ou garde du corps, il entre à l\'université de Cambridge et tente d\'intégrer l\'équipe des Footlights, la troupe dont sont issus les Monty Python. De cette époque, il garde des liens solides avec Graham Chapman, avec qui il travaille deux ans, et Terry Jones. Il participe à l\'écriture de sketchs pour l\'émission Monty Python\'s Flying Circus et y fait parfois de la figuration.\r\n</p>\r\n<p>\r\nÀ 25 ans, Douglas propose à la BBC une série radio intitulée The Hitchhiker\'s Guide to the Galaxy, dont le premier des douze épisodes est diffusé le 8 avril 1978. Cette série devient rapidement culte. Parallèlement, il écrit son premier script pour la télévision pour la série Doctor Who avec l\'épisode « The Pirate Planet. » Le succès du Hitchhiker dope la carrière de Douglas Adams qui devient producteur sur BBC Radio 4 et « script editor » (métier consistant à planifier et superviser à des fins de cohérence les scénarios d\'une série, à la manière d\'une script girl qui assure pour sa part le seul raccord des scènes) sur Doctor Who et écrira le scénario de deux épisodes, « City of Death » et « Shada ». Il collabore aussi à la série animée Docteur Snuggles.\r\n</p>\r\n<p>\r\nEn 1979, Douglas Adams publie le premier tome du cycle H2G2, Le Guide du routard galactique dont le nom sera changé ultérieurement ? à la demande expresse des Éditions du Routard ? et deviendra Le Guide du voyageur galactique. La série comprendra en tout cinq volumes (le dernier a été publié en 1992). H2G2 est adapté sur scène (en pièce de théâtre, en comédie musicale), en série télévisée et en jeu vidéo, adaptations auxquelles Douglas Adams participe activement. H2G2 est aussi adapté en bande dessinée par DC Comics mais l\'auteur ne s\'intéresse guère à cette adaptation, ce qui lui vaut sans doute un succès moindre. Enfin, un film dont l\'écriture a été commencée par Douglas Adams lui-même est sorti le 29 avril 2005 aux États-Unis et le 17 août en France (sous le titre H2G2 : Le Guide du voyageur galactique).\r\n</p>\r\n<p>\r\nDans le domaine du jeu vidéo, Douglas Adams est l\'auteur d\'une adaptation de H2G2 (Infocom, 1984) et d\'un jeu original baptisé Bureaucracy (Infocom, 1987). Il revient aux jeux vidéo en 1999 avec Starship Titanic publié par sa propre compagnie The Digital Village. Un roman du même nom, associé à ce jeu, est écrit par Terry Jones. Douglas Adams était aussi un grand fan des jeux vidéo de vie artificielle Creatures.\r\n</p>\r\n<p>\r\nIl est également grand amateur de musique (ses goûts vont de Bach aux Beatles) et guitariste à ses heures (il dispose d\'ailleurs à la fin de sa vie d\'une jolie collection d\'une vingtaine de guitares pour gaucher). Profondément marqué par la culture rock, Douglas a voulu casser, avec H2G2, le moule de la comédie classique de la BBC en créant un feuilleton inspiré des innovations rock de l\'époque (l\'Album blanc des Beatles par exemple). Son amour pour la musique l\'a amené à se lier avec plusieurs musiciens (dont David Gilmour, guitariste de Pink Floyd). Pour ses 42 ans, Douglas a eu pour cadeau d\'anniversaire une invitation à jouer deux morceaux sur la célèbre scène du Earls Court à Londres avec Pink Floyd.\r\n</p>\r\n<p>\r\nDouglas Adams se définissait lui-même comme athée radical, et était aussi passionné par les conséquences de la découverte de Darwin que son ami Richard Dawkins, qui prononcera en 2001 son oraison funèbre.\r\nTombe au cimetière de Highgate.\r\n</p>\r\n<p>\r\nEn mai 2001, Douglas Adams meurt à 49 ans, d\'une crise cardiaque en Californie où il venait de s\'installer avec sa femme et sa fille pour collaborer à l\'adaptation cinématographique du Guide du voyageur galactique, dont il ne vit donc jamais le résultat. Depuis, tous les 25 mai, est célébré le Towel Day en hommage à l\'écrivain. Il est enterré à Londres, au cimetière de Highgate.\r\n</p>\r\n<p>\r\nLe 11 mars 2013, un Google Doodle est créé en hommage au soixante-et-unième anniversaire de sa naissance\r\n</p>'),
-(7, 'Bordage', 'Pierre', '<p>\r\n<strong>Pierre Bordage</strong>, né le 29 janvier 1955 à La Réorthe, en Vendée, est un auteur de science-fiction français. C\'est avec sa trilogie Les Guerriers du silence, publiée aux éditions de l\'Atalante et vendue à 50 000 exemplaires, qu\'il rencontre le succès. Ce space opera ainsi que le cycle de Wang sont salués par la critique littéraire comme des ?uvres majeures du renouveau de la science-fiction française des années 1990, genre qui était alors dominé par les auteurs anglophones.\r\n<p>\r\n</p>\r\nAu fil de ses publications, Pierre Bordage acquiert la notoriété et une reconnaissance parmi les meilleurs romanciers populaires français. Auteur d\'une quarantaine d\'ouvrages ainsi que de nouvelles, publiés chez différents éditeurs (notamment Au diable vauvert) et de différents genres (fantasy historique avec L\'Enjomineur, science fantasy avec Les Fables de l\'Humpur, polar, etc.), il a aussi conçu des novélisations et réalisé quelques scénarios pour le cinéma, pour ensuite s\'essayer à l\'adaptation théâtrale, ainsi qu\'à celle de sa propre ?uvre en bande dessinée.\r\n</p>\r\n<p>\r\nLes ouvrages de Pierre Bordage ont une orientation humaniste, axée sur la découverte de la spiritualité, la lutte contre le fanatisme, ou encore le détournement du pouvoir politico-religieux au profit de quelques-uns. Bien qu\'issu de la science-fiction, il travaille davantage sur ses personnages que sur la science et les technologies qu\'il met en scène, et s\'inspire des épopées et des mythologies du monde entier.\r\n</p>\r\n<p>\r\nPierre Bordage a reçu de nombreux prix littéraires tels que le grand prix de l\'Imaginaire (1993) et le grand prix Paul-Féval de littérature populaire (2000). \r\n</p>'),
-(12, 'test', 'ss', 'ffqsqdff');
+(7, 'Bordage', 'Pierre', '<p>\r\n<strong>Pierre Bordage</strong>, né le 29 janvier 1955 à La Réorthe, en Vendée, est un auteur de science-fiction français. C\'est avec sa trilogie Les Guerriers du silence, publiée aux éditions de l\'Atalante et vendue à 50 000 exemplaires, qu\'il rencontre le succès. Ce space opera ainsi que le cycle de Wang sont salués par la critique littéraire comme des ?uvres majeures du renouveau de la science-fiction française des années 1990, genre qui était alors dominé par les auteurs anglophones.\r\n<p>\r\n</p>\r\nAu fil de ses publications, Pierre Bordage acquiert la notoriété et une reconnaissance parmi les meilleurs romanciers populaires français. Auteur d\'une quarantaine d\'ouvrages ainsi que de nouvelles, publiés chez différents éditeurs (notamment Au diable vauvert) et de différents genres (fantasy historique avec L\'Enjomineur, science fantasy avec Les Fables de l\'Humpur, polar, etc.), il a aussi conçu des novélisations et réalisé quelques scénarios pour le cinéma, pour ensuite s\'essayer à l\'adaptation théâtrale, ainsi qu\'à celle de sa propre ?uvre en bande dessinée.\r\n</p>\r\n<p>\r\nLes ouvrages de Pierre Bordage ont une orientation humaniste, axée sur la découverte de la spiritualité, la lutte contre le fanatisme, ou encore le détournement du pouvoir politico-religieux au profit de quelques-uns. Bien qu\'issu de la science-fiction, il travaille davantage sur ses personnages que sur la science et les technologies qu\'il met en scène, et s\'inspire des épopées et des mythologies du monde entier.\r\n</p>\r\n<p>\r\nPierre Bordage a reçu de nombreux prix littéraires tels que le grand prix de l\'Imaginaire (1993) et le grand prix Paul-Féval de littérature populaire (2000). \r\n</p>');
 
 -- --------------------------------------------------------
 
@@ -79,7 +81,29 @@ INSERT INTO `auteur_media` (`idauteur`, `idmedia`) VALUES
 (10, 20),
 (11, 19),
 (11, 20),
-(12, 21);
+(12, 21),
+(13, 21);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `categorie`
+--
+
+DROP TABLE IF EXISTS `categorie`;
+CREATE TABLE IF NOT EXISTS `categorie` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nom` varchar(255) NOT NULL,
+  `description` text,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+
+--
+-- Déchargement des données de la table `categorie`
+--
+
+INSERT INTO `categorie` (`id`, `nom`, `description`) VALUES
+(1, 'Anticipation', 'Vision du futur.\r\nYes man !');
 
 -- --------------------------------------------------------
 
@@ -95,7 +119,7 @@ CREATE TABLE IF NOT EXISTS `media` (
   `date` datetime DEFAULT NULL,
   `resume` text,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=24 DEFAULT CHARSET=utf8;
 
 --
 -- Déchargement des données de la table `media`
@@ -110,7 +134,7 @@ INSERT INTO `media` (`id`, `utilisateur_id`, `titre`, `date`, `resume`) VALUES
 (16, NULL, 'Le trône du dragon', '2020-03-06 14:47:00', NULL),
 (17, NULL, 'Miroirs et fumées', '2020-03-06 14:49:00', '<p>\r\n<strong>Miroirs et fumée</strong> (titre original: Smoke and Mirrors) est un recueil qui regroupe différentes nouvelles de Neil Gaiman préalablement publiées dans des anthologies, des revues au autre. Parmi ces nouvelles se sont notamment fait remarquer Les Mystères du meurtre qui raconte les bouleversements qui ont lieu à la suite de la découverte du corps d\'un ange au Paradis, Chevalerie où une vieille dame achète sans le savoir le Saint-Graal dans une boutique d\'occasion et Galaad se montre à sa porte ou encore Neige, verre et pommes qui est une nouvelle version de Blanche-Neige pour public averti.\r\n</p>\r\n<p>\r\nUne des nouvelles se trouve cachée au sein de l\'introduction. \r\n</p>\r\n<p>\r\nContenu :\r\n</p>\r\n<ol>\r\n    <li>Lire les entrailles : un rondeau (Reading the Entrails : a Rondel)</li>\r\n    <li>Une introduction (Introduction)</li>\r\n    <li>Chevalerie (Chivalry)</li>\r\n    <li>Nicholas était... (Nicholas Was...)</li>\r\n    <li>Le Prix (The Price)</li>\r\n    <li>Le Troll sous le pont (Troll Bridge)</li>\r\n    <li>Ne demandez rien au Diable (Don\'t Ask Jack)</li>\r\n    <li>Le Bassin aux poissons et autres contes (The Goldfish Pool and Other Stories)</li>\r\n    <li>La Route blanche (The White Road)</li>\r\n    <li>La Reine d\'épées (Queen of Knives)</li>\r\n    <li>Changements (Changes)</li>\r\n    <li>La Fille des chouettes (The Daughter of Owls)</li>\r\n    <li>La Spéciale des Shoggoths à l\'ancienne (Shoggoth\'s Old Peculiar)</li>\r\n    <li>Virus (Virus)</li>\r\n    <li>Cherchez la fille (Looking for the Girl)</li>\r\n    <li>Une fin du monde de plus (Only the End of the World Again)</li>\r\n    <li>Alerte : animal à bout (Bay Wolf)</li>\r\n    <li>On peut vous les faire au prix de gros (We Can Get Them for you Wholesale)</li>\r\n    <li>Une vie, meublée en Moorcock première manière (One Life, Furnished in Early Moorcock)</li>\r\n    <li>Couleurs froides (Cold Colors)</li>\r\n    <li>Le Balayeur de rêves (The Sweeper of Dreams)</li>\r\n    <li>Corps étrangers (Foreign Parts)</li>\r\n    <li>Sizain vampire (Vampire Sestina)</li>\r\n    <li>La Souris (Mouse)</li>\r\n    <li>Le Changement de mer (The Sea Change)</li>\r\n    <li>Le Jour où nous sommes allés voir la fin du monde (When We Went to See the End of the World)</li>\r\n    <li>Vent du désert (Desert Wind)</li>\r\n    <li>Saveurs (Tastings)</li>\r\n    <li>Mignons à croquer (Babycakes)</li>\r\n    <li>Les Mystères du meurtre (Murder Mysteries)</li>\r\n    <li>Neige, verre et pommes (Snow, Glass, Apples)</li>\r\n</ol>'),
 (18, 1, 'Au guet !', '2020-03-06 16:21:07', '<p>\r\n<strong>Au guet !</strong> est le huitième livre des Annales du Disque-monde de l\'écrivain anglais Terry Pratchett et publié en France en 1997. Traduit par Patrick Couton, il fut publié en France en 1997 chez L\'Atalante (ISBN 2-84172-045-4) et en 2000 chez Pocket (ISBN 2-266-09970-1). L\'?uvre originale fut publiée en 1989 sous le titre Guards! Guards!.\r\n</p>\r\n<p>\r\nUne adaptation en bande dessinée est à l\'heure actuelle en cours de production chez Atalante. \r\n</p>'),
-(21, 1, 'test', '2020-04-28 12:41:58', 'test pour changement');
+(23, 1, 'test 33', '2020-04-28 13:56:02', 'sdcscxcwxc');
 
 -- --------------------------------------------------------
 
