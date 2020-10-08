@@ -107,12 +107,20 @@ switch($action) {
         }
         break;
     case "linkAuthor":
-        if(isset($_POST["submitAddLink"])){
+        if(isset($_POST["submitAddLinkAuth"])){
             $idAuteur = $_POST["idAuteur"];
             $idMedia = $_POST["idMedia"];
             addLinkAthMd($idAuteur, $idMedia);
         }
         showLinkAuthorMedia("back");
+        break;
+    case "linkCat" :
+        if(isset($_POST["submitAddLinkCat"])){
+            $idCat = $_POST["idCategorie"];
+            $idMedia = $_POST["idMedia"];
+            addLinkCatMd($idCat, $idMedia);
+        }
+        showLinkCatMedia("back");
         break;
     case "addCat":
         if(isset($_POST["submitAddCat"])){
@@ -146,7 +154,10 @@ switch($action) {
             }
         }
         break;
+    case "showCat":
+        showCat(getCat($_GET["idCat"], "back"), "back", "form");
+        break;
     default:
-        showMedia(getLastMedia(), "back");
+        showMedia(getLastMedia("back"), "back");
 }
 ?>

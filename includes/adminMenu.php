@@ -26,7 +26,8 @@
                     <a class="dropdown-item" href="index.php?action=add">Ajouter Média</a>
                     <a class="dropdown-item" href="index.php?action=addAuthor">Ajouter auteur</a>
                     <a class="dropdown-item" href="index.php?action=addCat">Ajouter une catégorie</a>
-                    <a class="dropdown-item" href="index.php?action=linkAuthor">Lier auteur - Média</a>
+                    <a class="dropdown-item" href="index.php?action=linkAuthor">Lier Auteur - Média</a>
+                    <a class="dropdown-item" href="index.php?action=linkCat">Lier Catégorie - Média</a>
                     <!--
                     <a class="dropdown-item" href="#">Another action</a>
                     <div class="dropdown-divider"></div>

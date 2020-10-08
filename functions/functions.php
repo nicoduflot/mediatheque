@@ -13,7 +13,6 @@ $pageNumber = 1;
 function pagination($nbResultQuery, $nbPPages, $typePagination, $element){
     $pagination = "";
     $nbPages = ceil($nbResultQuery/$nbPPages);
-    //$pageNumber = 1;
     global $pageNumber;
     if($nbPages>$pageNumber){
         $pagination = $pagination."<span>Pages : ";
@@ -37,18 +36,16 @@ function pagination($nbResultQuery, $nbPPages, $typePagination, $element){
 //Liste des auteurs
 function getAuthorList($env = "front"){
     //get the author list in a select input
-    $link = openConn();
     $sql = "SELECT `a`.*, COUNT(`m`.`id`) AS `NbLivre`
 	FROM 
     	`auteur` `a` left join
         `auteur_media` `am` ON `a`.`id` = `am`.`idauteur` LEFT JOIN 
         `media` `m` ON `am`.`idmedia` = `m`.`id`
     GROUP BY `a`.`id` ORDER BY `a`.`nom`;";
-    $result = mysqli_query($link, $sql);
+    $result = selectBDD($sql);
     $nbRows = mysqli_num_rows($result);
     global $ndResPPage;
     $pagination = "";
-    //$pageNumber = 1;
     global $pageNumber;
     if($nbRows > 0){
         $pagination = pagination($nbRows, $ndResPPage, "pageNumberAuthor", "Author");
@@ -85,22 +82,19 @@ function getAuthorList($env = "front"){
     }else{
         echo "0 résultat";
     }
-    closeConn($link);
 }
 
 //liste des media
 
 function getMediaList($env = "front"){
-    $link = openConn();
     $sql = "SELECT 
-	            `l`.`id`, `l`.`titre`, `u`.`id` as `idUtilisateur`, `u`.`pseudo`
+	            `m`.`id`, `m`.`titre`, `u`.`id` as `idUtilisateur`, `u`.`pseudo`
             FROM 
-	            `media` `l` LEFT JOIN 
-	            `utilisateur` `u` ON `l`.`utilisateur_id` = `u`.`id` ORDER BY `l`.`titre`;";
-    $result = mysqli_query($link, $sql);
+	            `media` `m` LEFT JOIN 
+	            `utilisateur` `u` ON `m`.`utilisateur_id` = `u`.`id` ORDER BY `m`.`titre`;";
+    $result = selectBDD($sql);
     $nbRows = mysqli_num_rows($result);
     $pagination = "";
-    //$pageNumber = 1;
     global $pageNumber;
     global $ndResPPage;
     if($nbRows > 0){
@@ -139,19 +133,16 @@ function getMediaList($env = "front"){
     }else{
         echo "0 résultat";
     }
-    closeConn($link);
+    //closeConn($link);
 }
 
 //Liste des catégories
 function getCatList($env = "front"){
-    //get the author list in a select input
-    $link = openConn();
     $sql = "SELECT * FROM `categorie` `c` ORDER BY `c`.`nom`;";
-    $result = mysqli_query($link, $sql);
+    $result = selectBDD($sql);
     $nbRows = mysqli_num_rows($result);
     global $ndResPPage;
     $pagination = "";
-    //$pageNumber = 1;
     global $pageNumber;
     if($nbRows > 0){
         $pagination = pagination($nbRows, $ndResPPage, "pageNumberCat", "Cat");
@@ -189,19 +180,17 @@ function getCatList($env = "front"){
     }else{
         echo "0 résultat";
     }
-    closeConn($link);
 }
 
 // select de l'auteur pour le lien entre media et auteur
 
 function createAuthorSelect(){
-    $link = openConn();
     $sql = "SELECT 
 	            * 
             FROM 
 	            `auteur` `a`
 	        ORDER BY `a`.`nom`;";
-    $result = mysqli_query($link, $sql);
+    $result = selectBDD($sql);
     $nbRows = mysqli_num_rows($result);
     $selectAuthor = "";
     $startSelect = "<select name=\"idAuteur\" id=\"idAuteur\" class=\"col-lg-9\" >";
@@ -221,20 +210,18 @@ function createAuthorSelect(){
         $selectAuthor = $startSelect.$selectOptions.$endSelect;
         return $selectAuthor;
     }
-    closeConn($link);
 }
 
 // select du media pour le lien entre media et auteur
 
 function createMediaSelect(){
-    $link = openConn();
     $sql = "SELECT 
 	            * 
             FROM 
-	            `media` `l`
+	            `media` `m`
 	        ORDER BY 
-	            `l`.`titre`;";
-    $result = mysqli_query($link, $sql);
+	            `m`.`titre`;";
+    $result = selectBDD($sql);
     $nbRows = mysqli_num_rows($result);
     $selectBook = "";
     $startSelect = "<select name=\"idMedia\" id=\"idMedia\" class=\"col-lg-9\" >";
@@ -254,25 +241,63 @@ function createMediaSelect(){
         $selectBook = $startSelect.$selectOptions.$endSelect;
         return $selectBook;
     }
-    closeConn($link);
+}
+
+//createCatCheckBox
+function createCatCheckBox($idMedia = ""){
+    $whereFilter = "";
+    $joinFilter = "";
+    if($idMedia !== ""){
+        $whereFilter = " WHERE `mc`.`idMedia` = ".$idMedia;
+        $joinFilter = " LEFT JOIN `media_categorie` `mc` ON `c`.`id` = `mc`.`idMedia` ";
+    }
+    $sql = "SELECT `c`.`id` AS `idCategorie`, `c`.`nom` AS `nomCat` FROM `categorie` `c` ". $joinFilter . $whereFilter . ";";
+    echo $sql;
+}
+
+//createCatSelect
+function createCatSelect(){
+    $sql = "SELECT 
+	            * 
+            FROM 
+	            `categorie` `c`
+	        ORDER BY `c`.`nom`;";
+    $result = selectBDD($sql);
+    $nbRows = mysqli_num_rows($result);
+    $selectAuthor = "";
+    $startSelect = "<select name=\"idCategorie\" id=\"idCategorie\" class=\"col-lg-9\" >";
+    $selectOptions = "<option value=\"0\">Choisir une catégorie</option>";
+    $endSelect = "</select>";
+    $nbRows = mysqli_num_rows($result);
+    if($nbRows > 0){
+        $i = 0;
+        while($i < $nbRows) {
+            $row = mysqli_fetch_assoc($result);
+            $selectOptions .= "<option value=\"".$row["id"]."\">".utf8_encode($row["nom"])."</option>";
+            $i++;
+        }
+        $selectAuthor = $startSelect.$selectOptions.$endSelect;
+        return $selectAuthor;
+    }else{
+        $selectAuthor = $startSelect.$selectOptions.$endSelect;
+        return $selectAuthor;
+    }
+
 }
 
 //fonction de vérification pour la connexion d'un utilisateur
 
 function getAuthentication($email, $password){
-    $link = openConn();
     $sql = "SELECT * FROM `utilisateur` WHERE `email` like '".$email."' AND ".
     " `motdepasse` LIKE '".$password."';";
-    $result = mysqli_query($link, $sql);
+    $result = selectBDD($sql);
     $row = mysqli_fetch_assoc($result);
     if(mysqli_num_rows($result)>0){
         $_SESSION["accesAdmin"] = true;
         $_SESSION["utilisateur"] = $row["pseudo"];
         $_SESSION["idUtilisateur"] = $row["id"];
-        closeConn($link);
         return true;
     }else{
-        closeConn($link);
         return false;
     }
 }
@@ -280,17 +305,16 @@ function getAuthentication($email, $password){
 // récupération d'un auteur particulier
 
 function getAuthor($id, $env = "front"){
-    $link = openConn();
     $media = "";
     $sql = "SELECT 
-	            `a`.`id`, `a`.`nom`, `a`.`prenom`, `a`.`bio`, `l`.`id` as `idMedia`, `l`.`titre`
+	            `a`.`id`, `a`.`nom`, `a`.`prenom`, `a`.`bio`, `m`.`id` as `idMedia`, `m`.`titre`
             FROM
                 `auteur` `a` LEFT JOIN 
-                `auteur_media` `a_l` ON `a`.`id` = `a_l`.`idauteur` LEFT JOIN 
-                `media` `l` ON `a_l`.`idmedia` = `l`.`id`
+                `auteur_media` `a_m` ON `a`.`id` = `a_m`.`idauteur` LEFT JOIN 
+                `media` `m` ON `a_m`.`idmedia` = `m`.`id`
             WHERE 
                 `a`.`id` = ".$id." ;";
-    $result = mysqli_query($link, $sql);
+    $result = selectBDD($sql);
     $nbRows = mysqli_num_rows($result);
     $editButton = "";
     if($nbRows > 0){
@@ -314,32 +338,34 @@ function getAuthor($id, $env = "front"){
         return ["idAuteur"=>"", "prenom"=>"",
             "nom"=>"", "bio"=>"", "mediaAuteur" =>$media, "editbutton"=>$editButton];
     }
-    closeConn($link);
 }
 
 // récupération d'un media particulier.
 
 function getMedia($id, $env = "front"){
-    $link = openConn();
     $sql = "SELECT 
-	            `l`.`id`, `l`.`titre`, `u`.`id` as `idUtilisateur`, `u`.`pseudo`, 
-	            `l`.`resume`, `l`.`date`, `a`.`nom`, `a`.`prenom`, `a`.`id` as `idauteur` 
+	            `m`.`id`, `m`.`titre`, `u`.`id` as `idUtilisateur`, `u`.`pseudo`, 
+	            `m`.`resume`, `m`.`date`, `a`.`nom`, `a`.`prenom`, `a`.`id` as `idauteur`, 
+                `c`.`nom` as `categorie` 
             FROM 
-	            `media` `l` LEFT JOIN 
-	            `utilisateur` `u` ON `l`.`utilisateur_id` = `u`.`id` LEFT JOIN 
-	             `auteur_media` `a_l` ON `l`.`id` = `a_l`.`idmedia` LEFT JOIN 
-	             `auteur` `a` ON `a_l`.`idauteur` = `a`.`id`  
-	        WHERE `l`.`id` = ".$id." ;";
-    //printRResult($sql);
+	            `media` `m` LEFT JOIN 
+	            `utilisateur` `u` ON `m`.`utilisateur_id` = `u`.`id` LEFT JOIN 
+	             `auteur_media` `a_m` ON `m`.`id` = `a_m`.`idmedia` LEFT JOIN 
+	             `auteur` `a` ON `a_m`.`idauteur` = `a`.`id` LEFT JOIN 
+                 `media_categorie` `mc` ON `m`.`id` = `mc`.`idMedia` LEFT JOIN
+                 `categorie` `c` ON `mc`.`idCategorie` = `c`.`id`
+	        WHERE `m`.`id` = ".$id." ;";
     $auteur = "";
+    $categorie = "";
     $editButton = "";
-    $result = mysqli_query($link, $sql);
+    $result = selectBDD($sql);
     $nbRows = mysqli_num_rows($result);
     if($nbRows > 0){
         $i = 0;
         while($i < $nbRows) {
             $row = mysqli_fetch_assoc($result);
             $auteur = $auteur . "<a href=\"index.php?action=showAuteur&idAuteur=".$row["idauteur"]."\">".$row["prenom"]." ".$row["nom"]."</a><br />";
+            $categorie = $categorie . $row["categorie"]."<br />";
             $i++;
         }
         if($env != "front"){
@@ -351,20 +377,21 @@ function getMedia($id, $env = "front"){
                 "</a>";
         }
         return ["id"=>$row["id"], "titre"=>$row["titre"],
+            "categorie" => $categorie,
             "idUtilisateur"=>$row["idUtilisateur"], "pseudo"=>$row["pseudo"],
             "resume"=>$row["resume"], "dateCreated"=>$row["date"],
             "nom"=>$row["nom"], "prenom"=>$row["prenom"], "idauteur"=>$row["idauteur"], "auteur"=>$auteur, "editbutton"=>$editButton];
     }else{
+        //var_dump($_SESSION);
         return ["id"=>"", "titre"=>"",
+            "categorie" => $categorie,
             "idUtilisateur"=>$_SESSION["idUtilisateur"], "pseudo"=>$_SESSION["utilisateur"],
             "resume"=>"", "dateCreated"=>"",
-            "nom"=>"", "prenom"=>"", "idauteur"=>"", "auteur"=>"", "editbutton"=>$editButton];
+            "nom"=>"", "prenom"=>"", "idauteur"=>"", "auteur"=>$auteur, "editbutton"=>$editButton];
     }
-    closeConn($link);
 }
 
 function getCat($id, $env = "front"){
-    $link = openConn();
     $media = "";
     $sql = "SELECT 
 	            `c`.`id`, `c`.`nom`, `c`.`description`
@@ -372,8 +399,7 @@ function getCat($id, $env = "front"){
                 `categorie` `c`
             WHERE 
                 `c`.`id` = ".$id." ;";
-    //printRResult($sql);
-    $result = mysqli_query($link, $sql);
+    $result = selectBDD($sql);
     $nbRows = mysqli_num_rows($result);
     $editButton = "";
     if($nbRows > 0){
@@ -393,30 +419,57 @@ function getCat($id, $env = "front"){
         return ["idCat"=>"", "nom"=>"",
             "description"=>"", "editbutton"=>$editButton];
     }
-    closeConn($link);
 }
 
 // récupération du dernier media enregistré
 
-function getLastMedia(){
-    $link = openConn();
+function getLastMedia($env = "front"){
     $sql = "SELECT 
-	            `l`.`id`, `l`.`titre`, `u`.`id` as `idUtilisateur`, `u`.`pseudo`,
-	            `l`.`resume`, `l`.`date` 
+	            `m`.`id`, `m`.`titre`, `u`.`id` as `idUtilisateur`, `u`.`pseudo`, 
+	            `m`.`resume`, `m`.`date`, `a`.`nom`, `a`.`prenom`, `a`.`id` as `idauteur`, 
+                `c`.`nom` as `categorie` 
             FROM 
-	            `media` `l` LEFT JOIN 
-	            `utilisateur` `u` ON `l`.`utilisateur_id` = `u`.`id`
+	            `media` `m` LEFT JOIN 
+	            `utilisateur` `u` ON `m`.`utilisateur_id` = `u`.`id` LEFT JOIN 
+	             `auteur_media` `a_m` ON `m`.`id` = `a_m`.`idmedia` LEFT JOIN 
+	             `auteur` `a` ON `a_m`.`idauteur` = `a`.`id` LEFT JOIN 
+                 `media_categorie` `mc` ON `m`.`id` = `mc`.`idMedia` LEFT JOIN
+                 `categorie` `c` ON `mc`.`idCategorie` = `c`.`id`
 	        ORDER BY 
-	            `l`.`id` DESC LIMIT 1;";
-    $result = mysqli_query($link, $sql);
+	            `m`.`id` DESC LIMIT 1;";
+    $auteur = "";
+    $categorie = "";
+    $editButton = "";
+    $result = selectBDD($sql);
     $nbRows = mysqli_num_rows($result);
     if($nbRows > 0){
-        $row = mysqli_fetch_assoc($result);
+        $i = 0;
+        while($i < $nbRows) {
+            $row = mysqli_fetch_assoc($result);
+            $auteur = $auteur . "<a href=\"index.php?action=showAuteur&idAuteur=".$row["idauteur"]."\">".$row["prenom"]." ".$row["nom"]."</a><br />";
+            $categorie = $categorie . $row["categorie"]."<br />";
+            $i++;
+        }
+        if($env != "front"){
+            $editButton = "".
+                "<a href=\"index.php?action=edit&idMedia=".$row["id"]."\">".
+                "<button type=\"button\" name=\"editMedia\" id=\"editMedia\" class=\"btn btn-primary\">".
+                "Editer".
+                "</button>".
+                "</a>";
+        }
         return ["id"=>$row["id"], "titre"=>$row["titre"],
+            "categorie" => $categorie,
             "idUtilisateur"=>$row["idUtilisateur"], "pseudo"=>$row["pseudo"],
-            "resume"=>$row["resume"], "dateCreated"=>$row["date"]];
+            "resume"=>$row["resume"], "dateCreated"=>$row["date"],
+            "nom"=>$row["nom"], "prenom"=>$row["prenom"], "idauteur"=>$row["idauteur"], "auteur"=>$auteur, "editbutton"=>$editButton];
+    }else{
+        return ["id"=>"", "titre"=>"",
+            "categorie" => $categorie,
+            "idUtilisateur"=>$_SESSION["idUtilisateur"], "pseudo"=>$_SESSION["utilisateur"],
+            "resume"=>"", "dateCreated"=>"",
+            "nom"=>"", "prenom"=>"", "idauteur"=>"", "auteur"=>$auteur, "editbutton"=>$editButton];
     }
-    closeConn($link);
 }
 
 // appel de la page de confirmation de la suppression d'un auteur ou d'un media
@@ -427,9 +480,7 @@ function showDelete($data){
         echo "Echec de l'ouverture du fichier";
         exit;
     }else{
-        while(!feof($template)){
-            echo decodeMedia(fgets($template), $data, "back");
-        }
+        echo decodeMedia(fread($template, filesize($pathFile)), $data, "back");
     }
 }
 
@@ -439,9 +490,7 @@ function showDeleteAuthor($data){
         echo "Echec de l'ouverture du fichier";
         exit;
     }else{
-        while(!feof($template)){
-            echo decodeAuthor(fgets($template), $data, "back");
-        }
+        echo decodeAuthor(fread($template, filesize($pathFile)), $data, "back");
     }
 }
 
@@ -451,35 +500,29 @@ function showDeleteCat($data){
         echo "Echec de l'ouverture du fichier";
         exit;
     }else{
-        while(!feof($template)){
-            echo decodeCat(fgets($template), $data, "back");
-        }
+        echo decodeCat(fread($template, filesize($pathFile)), $data, "back");
     }
 }
 
 function showMedia($media, $env = "front", $model = "media"){
-    $pathFile = ($env != "front") ? "../" : "";
+    $pathFile = ($env != "front") ? "../" : "./";
     $pathFile = $pathFile.(($model != "media") ? "template/form" : "template/media");
     if(!$template = fopen($pathFile.".html", "r")){
         echo "Echec de l'ouverture du fichier";
         exit;
     }else{
-        while(!feof($template)){
-            echo decodeMedia(fgets($template), $media, $env);
-        }
+        echo decodeMedia(fread($template, filesize($pathFile.".html")), $media, $env);
     }
 }
 
 function showAuthor($media, $env = "front", $model = "author"){
-    $pathFile = ($env != "front") ? "../" : "";
+    $pathFile = ($env != "front") ? "../" : "./";
     $pathFile = $pathFile.(($model != "author") ? "template/formAuthor" : "template/auteur");
     if(!$template = fopen($pathFile.".html", "r")){
         echo "Echec de l'ouverture du fichier";
         exit;
     }else{
-        while(!feof($template)){
-            echo decodeAuthor(fgets($template), $media);
-        }
+        echo decodeAuthor(fread($template, filesize($pathFile.".html")), $media);
     }
 }
 
@@ -491,9 +534,7 @@ function showCat($cat, $env = "front", $model = "cat"){
         echo "Echec de l'ouverture du fichier";
         exit;
     }else{
-        while(!feof($template)){
-            echo decodeCat(fgets($template), $cat);
-        }
+        echo decodeCat(fread($template, filesize($pathFile.".html")), $cat);
     }
 }
 
@@ -504,9 +545,18 @@ function showLinkAuthorMedia($env = "front"){
         echo "Echec de l'ouverture du fichier";
         exit;
     }else{
+        echo decodeLinkAthMd(fread($template, filesize($pathFile)), createAuthorSelect(), createMediaSelect());
+    }
+}
 
-        while(!feof($template)){
-            echo decodeLinkAthMd(fgets($template), createAuthorSelect(), createMediaSelect());
-        }
+//showLinkCatMedia
+function showLinkCatMedia($env = "front"){
+    $pathFile = $pathFile = ($env != "front") ? "../" : "";
+    $pathFile = $pathFile."template/categorieMedia.html";
+    if(!$template = fopen($pathFile, "r")){
+        echo "Echec de l'ouverture du fichier";
+        exit;
+    }else{
+        echo decodeLinkCatMd(fread($template, filesize($pathFile)), createCatSelect(), createMediaSelect());
     }
 }

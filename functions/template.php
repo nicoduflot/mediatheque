@@ -3,13 +3,16 @@
 
 function decodeMedia($templateLine, $media, $env = "front"){
     $pathFile = ($env != "front") ? "../" : "";
+
     $templateLine = str_replace("%titre%", utf8_encode(stripslashes($media["titre"])), $templateLine);
     $templateLine = str_replace("%dateCreated%", utf8_encode(stripslashes($media["dateCreated"])), $templateLine);
     $templateLine = str_replace("%resume%", utf8_encode(stripslashes($media["resume"])), $templateLine);
+
     $templateLine = str_replace("%nom%", utf8_encode(stripslashes($media["nom"])), $templateLine);
     $templateLine = str_replace("%prenom%", utf8_encode(stripslashes($media["prenom"])), $templateLine);
     $templateLine = str_replace("%idauteur%", utf8_encode(stripslashes($media["idauteur"])), $templateLine);
     $templateLine = str_replace("%auteur%", utf8_encode(stripslashes($media["auteur"])), $templateLine);
+    $templateLine = str_replace("%categorie%", utf8_encode(stripslashes($media["categorie"])), $templateLine);
     $templateLine = str_replace("%editbutton%", utf8_encode(stripslashes($media["editbutton"])), $templateLine);
     $templateLine = str_replace("%env%", utf8_encode(stripslashes($pathFile)), $templateLine);
     $templateLine = str_replace("%idMedia%", utf8_encode(stripslashes($media["id"])), $templateLine);
@@ -34,6 +37,12 @@ function decodeAuthor($templateLine, $media)
 
 function decodeLinkAthMd($templateLine, $listeAuteur, $listeMedia){
     $templateLine = str_replace("%listeAuteur%", $listeAuteur, $templateLine);
+    $templateLine = str_replace("%listeMedia%", $listeMedia, $templateLine);
+    return $templateLine;
+}
+
+function decodeLinkCatMd($templateLine, $listeAuteur, $listeMedia){
+    $templateLine = str_replace("%listeCategorie%", $listeAuteur, $templateLine);
     $templateLine = str_replace("%listeMedia%", $listeMedia, $templateLine);
     return $templateLine;
 }
